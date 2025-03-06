@@ -6,15 +6,11 @@ export default function RoleBasedButton() {
 
   if (user && user?.publicMetadata?.role === 'admin') {
     return (
-      <button className="bg-blue-500 text-white px-4 py-2 rounded">
-        <Link href='/admin'>Admin Dashboard</Link>
-      </button>
+        <Link className="bg-blue-500 text-white px-4 py-2 rounded" href='/admin'>Admin Dashboard</Link>
     );
   }else if(user) {
     return(
-        <button className="bg-red-500 text-white px-4 py-2 rounded">
-        <Link href='/user'>User Dashboard</Link>
-      </button>
+        <Link className="bg-red-500 text-white px-4 py-2 rounded" href='/user'>User Dashboard</Link>
     )
   }
 
