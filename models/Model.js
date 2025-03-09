@@ -9,9 +9,8 @@ const userSchema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// Phone Schema
 const phoneSchema = new Schema({
-  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },  
+  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
   brand: { type: String, required: true },
   price: { type: Number, required: true },
@@ -19,29 +18,24 @@ const phoneSchema = new Schema({
   rating: { type: Number },
   image: { type: String },
   images: [{ type: String }],
-  isRecent: { type: Boolean, default: false },
   isFeatured: { type: Boolean, default: false },
-  specs: { type: Schema.Types.ObjectId, ref: 'Specs' },
   description: { type: String },
   releaseDate: { type: Date },
-  createdAt: { type: Date, default: Date.now }
-});
-
-// Specs Schema
-const specsSchema = new Schema({
-  phoneId: { type: Schema.Types.ObjectId, ref: 'Phone', required: true },
-  display: { type: String },
-  resolution: { type: String },
-  processor: { type: String },
-  ram: [{ type: String }],
-  storage: [{ type: String }],
-  battery: { type: String },
-  os: { type: String },
-  weight: { type: String },
-  dimensions: { type: String },
-  camera: { type: Object },
-  features: { type: Object },
-  colors: [{ type: String }]
+  createdAt: { type: Date, default: Date.now },
+  specs: {
+    display: { type: String },
+    resolution: { type: String },
+    processor: { type: String },
+    ram: [{ type: String }],
+    storage: [{ type: String }],
+    battery: { type: String },
+    os: { type: String },
+    weight: { type: String },
+    dimensions: { type: String },
+    camera: { type: Object },
+    features: { type: Object },
+    colors: [{ type: String }]
+  }
 });
 
 // Cart Schema
@@ -137,7 +131,6 @@ const analyticsSchema = new Schema({
 // Models
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 const Phone = mongoose.models.Phone || mongoose.model('Phone', phoneSchema);
-const Specs = mongoose.models.Specs || mongoose.model('Specs', specsSchema);
 const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
 const CartItem = mongoose.models.CartItem || mongoose.model('CartItem', cartItemSchema);
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
@@ -152,7 +145,6 @@ const Analytics = mongoose.models.Analytics || mongoose.model('Analytics', analy
 module.exports = {
   User,
   Phone,
-  Specs,
   Cart,
   CartItem,
   Order,
