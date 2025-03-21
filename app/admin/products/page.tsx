@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/dialog"
 import { Pencil, Trash2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import type { Phone } from "@/types/phone"
+import Link from "next/link"
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Phone[]>([])
-  const [editingProduct, setEditingProduct] = useState<Phone | null>(null)
+  const [products, setProducts] = useState([])
+  const [editingProduct, setEditingProduct] = useState(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -29,13 +29,14 @@ export default function ProductsPage() {
 
   const fetchProducts = async () => {
     const response = await fetch("/api/phones")
+    console.log(response)
     if (response.ok) {
       const data = await response.json()
       setProducts(data)
     }
   }
 
-  const handleUpdateProduct = async (updatedProduct: Phone) => {
+  const handleUpdateProduct = async (updatedProduct: any) => {
     const response = await fetch("/api/phones", {
       method: "PUT",
       headers: {
@@ -85,10 +86,11 @@ export default function ProductsPage() {
       <CardHeader>
         <CardTitle>Product Management</CardTitle>
         <CardDescription>Manage product listings, prices, and inventory</CardDescription>
+        <Button><Link href='/admin/addProductForm'>Add Product</Link></Button>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {products.map((product) => (
+          {products.map((product: any) => (
             <div key={product.id} className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{product.name}</p>
