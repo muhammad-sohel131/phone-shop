@@ -26,15 +26,14 @@ const phoneSchema = new Schema({
     display: { type: String },
     resolution: { type: String },
     processor: { type: String },
-    ram: [{ type: String }],
-    storage: [{ type: String }],
+    variants: [{ type: Object }],
     battery: { type: String },
     os: { type: String },
     weight: { type: String },
     dimensions: { type: String },
     camera: { type: Object },
     features: { type: Object },
-    colors: [{ type: String }]
+    colors: [{ type: Object }]
   }
 });
 
