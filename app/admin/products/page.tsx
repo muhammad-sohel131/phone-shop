@@ -17,6 +17,7 @@ import {
 import { Pencil, Trash2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link"
+import { globalVariables } from "@/lib/db"
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([])
@@ -28,10 +29,10 @@ export default function ProductsPage() {
   }, [])
 
   const fetchProducts = async () => {
-    const response = await fetch("/api/phones")
-    console.log(response)
+    const response = await fetch(`${globalVariables.url}/api/phones`)
     if (response.ok) {
       const data = await response.json()
+      console.log(data)
       setProducts(data)
     }
   }

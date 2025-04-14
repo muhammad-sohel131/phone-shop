@@ -13,11 +13,10 @@ const phoneSchema = new Schema({
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
   brand: { type: String, required: true },
-  price: { type: Number, required: true },
-  originalPrice: { type: Number },
+  // price: { type: Number, required: true },
+  // originalPrice: { type: Number },
   rating: { type: Number },
   image: { type: String },
-  images: [{ type: String }],
   isFeatured: { type: Boolean, default: false },
   description: { type: String },
   releaseDate: { type: Date },
@@ -33,7 +32,7 @@ const phoneSchema = new Schema({
     dimensions: { type: String },
     camera: { type: Object },
     features: { type: Object },
-    colors: [{ type: Object }]
+    // colors: [{ type: Object }]
   }
 });
 
