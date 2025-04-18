@@ -562,7 +562,7 @@ export function writeDb(data: any) {
 }
 
 export const globalVariables = {
-  // url: "http://localhost:3000",
-  url: "https://phone-shop-rho-one.vercel.app",
+  url: "http://localhost:3000",
+  // url: "https://phone-shop-rho-one.vercel.app",
 }
 
