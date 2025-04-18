@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,11 +19,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 
 import { globalVariables } from "@/lib/db";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
 import { toast } from 'react-toastify';
-import { useRouter } from "next/router";
-import { redirect } from "next/navigation";
+import { redirect, useParams } from "next/navigation";
 
 // Define the form schema using Zod
 const formSchema = z.object({
@@ -73,10 +70,11 @@ const formSchema = z.object({
 export default function AddProductForm() {
 
   const [saving, setSaving] = useState(false)
-  // const router = useRouter()
-
   
-  // Initialize the form
+  const params = useParams();
+  const paramsId = params.id;
+
+  // Initialize the form with empty defaults
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -90,15 +88,13 @@ export default function AddProductForm() {
         display: "",
         resolution: "",
         processor: "",
-        variants: [
-          {
-            storage: "",
-            colors: { color: "", image: "" },
-            price: 0,
-            originalPrice: 0,
-            quantity: 0,
-          },
-        ],
+        variants: [{
+          storage: "",
+          colors: { color: "", image: "" },
+          price: 0,
+          originalPrice: 0,
+          quantity: 0,
+        }],
         battery: "",
         os: "",
         weight: "",
@@ -112,14 +108,40 @@ export default function AddProductForm() {
           waterResistance: false,
           wirelessCharging: false,
         },
-      },
-    },
+      }
+    }
   });
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "specs.variants",
   });
 
+  useEffect(() => {
+    if (paramsId && paramsId !== 'new') {
+      fetch(`/api/phones/${paramsId}`)
+        .then(res => res.json())
+        .then(data => {
+          form.reset({
+            ...data,
+            releaseDate: data.releaseDate 
+            ? new Date(data.releaseDate).toISOString().split('T')[0]
+            : "",
+            specs: {
+              ...data.specs,
+              variants: data.specs.variants?.length ? data.specs.variants : [{
+                storage: "",
+                colors: { color: "", image: "" },
+                price: 0,
+                originalPrice: 0,
+                quantity: 0,
+              }]
+            }
+          });
+        })
+        .catch(err => console.log(err));
+    }
+  }, [paramsId]);
 
   // Handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -127,8 +149,8 @@ export default function AddProductForm() {
     // Add your logic to submit the form data to the backend
     setSaving(true)
     try {
-      const response = await fetch(`${globalVariables.url}/api/phones`, {
-        method: "POST",
+      const response = await fetch(paramsId !== 'new' ? `/api/phones/${paramsId}` : '/api/phones', {
+        method: paramsId !== 'new' ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -136,16 +158,14 @@ export default function AddProductForm() {
       });
 
       if (!response.ok) {
-        toast.error("Failed to save phone data")
         throw new Error("Failed to save phone data");
       }
 
       const data = await response.json();
-      toast.success("Added successfully")
+      toast.success(paramsId !== 'new' ? "Updated successfully" : "Added successfully")
       console.log("Data added successfully", data);
       setTimeout(() => {
-        // router.push(`${globalVariables.url}/admin/products`)
-        redirect(`${globalVariables.url}/admin/products`)
+        redirect(`/admin/products`)
       }, 500)
     } catch (err) {
       toast.error("Failed to save phone data")
@@ -157,7 +177,7 @@ export default function AddProductForm() {
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-8">Add New Product</h1>
+        <h1 className="text-2xl font-bold mb-8">{paramsId !== 'new' ? "Edit" : "Add New"} Product</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Basic Information */}
@@ -512,7 +532,7 @@ export default function AddProductForm() {
 
             {/* Submit Button */}
             <Button type="submit" className="w-full" disabled={saving}>
-              {saving ? 'Adding...' : 'Add Product'}
+              {saving ?  paramsId !== 'new' ? 'Updating...' : 'Adding...' : paramsId !== 'new' ? 'Edit Product' : 'Add Product'}
             </Button>
           </form>
         </Form>

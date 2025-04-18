@@ -70,7 +70,7 @@ export default function ProductsPage() {
           Manage product listings, prices, and inventory
         </CardDescription>
         <Button>
-          <Link href="/admin/addProductForm">Add Product</Link>
+          <Link href="/admin/addProductForm/new">Add Product</Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -87,7 +87,7 @@ export default function ProductsPage() {
                 </p>
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" onClick={() => redirect('/admin/addProductForm')}>
+                <Button variant="outline" size="sm" onClick={() => redirect(`/admin/addProductForm/${product._id}`)}>
                   <Pencil className="h-4 w-4 mr-2" />
                   Edit
                 </Button>

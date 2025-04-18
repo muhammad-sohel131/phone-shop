@@ -29,40 +29,6 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PUT(request: Request) {
-  try {
-    await connectDB();
-    const body = await request.json();
-
-
-    if (!body._id) {
-      return NextResponse.json(
-        { error: "Phone ID is required for updating" },
-        { status: 400 }
-      );
-    }
-
-    const updatedPhone = await Phone.findByIdAndUpdate(
-      body._id, 
-      body, 
-      { new: true } 
-    );
-
-    if (!updatedPhone) {
-      return NextResponse.json(
-        { error: "Phone not found" },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json(updatedPhone, { status: 200 });
-  } catch (error) {
-    console.error("Error updating phone:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-}
 
 export async function DELETE(request: Request) {
   try {
