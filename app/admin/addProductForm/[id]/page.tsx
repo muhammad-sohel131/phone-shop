@@ -37,22 +37,14 @@ export const phoneSchema = z.object({
     display: z.string(),
     resolution: z.string(),
     processor: z.string(),
-    colors: z.array(
-      z.object({
-        color: z.string().min(1, "Color is required"),
-        image: z.string().url("Must be a valid URL"),
-      })
-    ),
-    variants: z.array(
-      z.object({
-        price: z.number().min(0, "Price must be a positive number."),
-        originalPrice: z
-          .number()
-          .min(0, "Original price must be a positive number."),
-        quantity: z.number().min(0, "Quantity must be a positive number."),
-        storage: z.string().min(1, "Storage is required"),
-      })
-    ),
+    color: z.string().min(1, "Color is required"),
+    image: z.string().url("Must be a valid URL"),
+    price: z.number().min(0, "Price must be a positive number."),
+    originalPrice: z
+      .number()
+      .min(0, "Original price must be a positive number."),
+    quantity: z.number().min(0, "Quantity must be a positive number."),
+    storage: z.string().min(1, "Storage is required"),
     battery: z.string(),
     os: z.string(),
     weight: z.string(),
@@ -89,15 +81,12 @@ export default function AddProductForm() {
         display: "",
         resolution: "",
         processor: "",
-        colors: [{ color: "", image: "" }],
-        variants: [
-          {
-            storage: "",
-            price: 0,
-            originalPrice: 0,
-            quantity: 0,
-          },
-        ],
+        color: "",
+        image: "",
+        storage: "",
+        price: 0,
+        originalPrice: 0,
+        quantity: 0,
         battery: "",
         os: "",
         weight: "",
@@ -115,30 +104,12 @@ export default function AddProductForm() {
     },
   });
 
-  const {
-    fields: variants,
-    append: appendVariants,
-    remove: removeVariants,
-  } = useFieldArray({
-    control: form.control,
-    name: "specs.variants",
-  });
-
-  const {
-    fields: colors,
-    append: appendColors,
-    remove: removeColors,
-  } = useFieldArray({
-    control: form.control,
-    name: "specs.colors",
-  });
-
   useEffect(() => {
     if (paramsId && paramsId !== "new") {
       fetch(`/api/phones/${paramsId}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log(data)
+          console.log(data);
           form.reset({
             ...data,
             releaseDate: data.releaseDate
@@ -146,18 +117,6 @@ export default function AddProductForm() {
               : "",
             specs: {
               ...data.specs,
-              colors: data.specs.colors?.length
-                ? data.specs.colors : [{ color: "", image: "" }],
-              variants: data.specs.variants?.length
-                ? data.specs.variants
-                : [
-                    {
-                      storage: "",
-                      price: 0,
-                      originalPrice: 0,
-                      quantity: 0,
-                    },
-                  ],
             },
           });
         })
@@ -181,7 +140,7 @@ export default function AddProductForm() {
           body: JSON.stringify(values),
         }
       );
-      console.log(response)
+      console.log(response);
       if (!response.ok) {
         throw new Error("Failed to save phone data");
       }
@@ -320,130 +279,62 @@ export default function AddProductForm() {
               />
 
               <div className="space-y-2">
-                <FormLabel>Colors</FormLabel>
-                {colors.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="flex border border-red-700 p-5 rounded-lg items-center gap-4"
-                  >
-                    <div className="w-[90%]">
-                      <span>Color</span>
-                      <Input
-                        placeholder="White"
-                        {...form.register(`specs.colors.${index}.color`)}
-                      />
-                      <span>Image</span>
-                      <Input
-                        placeholder="Image URL"
-                        {...form.register(`specs.colors.${index}.image`)}
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      disabled={colors.length < 2 ? true : false}
-                      onClick={() =>
-                        colors.length > 1 && removeColors(index)
-                      }
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  onClick={() =>
-                    appendColors({
-                      color: '',
-                      image: ''
-                    })
-                  }
-                >
-                  Add Variant
-                </Button>
+                <span>Color</span>
+                <Input placeholder="White" {...form.register(`specs.color`)} />
+                <span>Image</span>
+                <Input
+                  placeholder="Image URL"
+                  {...form.register(`specs.image`)}
+                />
               </div>
               {/* Variants (RAM & Storage) */}
 
               <div className="space-y-2">
                 <FormLabel>Variants</FormLabel>
-                {variants.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="flex border border-red-700 p-5 rounded-lg items-center gap-4"
-                  >
-                    <div className="w-[90%]">
-                      <span>Storage</span>
-                      <Input
-                        placeholder="128GB/32GB"
-                        {...form.register(`specs.variants.${index}.storage`)}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`specs.variants.${index}.price`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Price</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                {...field}
-                                value={field.value}
-                                onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
 
-                      <span>Original Price</span>
-                      <Input
-                        type="number"
-                        placeholder="Original Price"
-                        {...form.register(
-                          `specs.variants.${index}.originalPrice`,
-                          {
-                            valueAsNumber: true,
+                <span>Storage</span>
+                <Input
+                  placeholder="128GB/32GB"
+                  {...form.register(`specs.storage`)}
+                />
+                <FormField
+                  control={form.control}
+                  name={`specs.price`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
                           }
-                        )}
-                      />
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                      <span>Quantity</span>
-                      <Input
-                        type="number"
-                        placeholder="Quantity"
-                        {...form.register(`specs.variants.${index}.quantity`, {
-                          valueAsNumber: true,
-                        })}
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      disabled={variants.length < 2 ? true : false}
-                      onClick={() =>
-                        variants.length > 1 && removeVariants(index)
-                      }
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  onClick={() =>
-                    appendVariants({
-                      storage: "",
-                      price: 0,
-                      originalPrice: 0,
-                      quantity: 0,
-                    })
-                  }
-                >
-                  Add Variant
-                </Button>
+                <span>Original Price</span>
+                <Input
+                  type="number"
+                  placeholder="Original Price"
+                  {...form.register(`specs.originalPrice`, {
+                    valueAsNumber: true,
+                  })}
+                />
+
+                <span>Quantity</span>
+                <Input
+                  type="number"
+                  placeholder="Quantity"
+                  {...form.register(`specs.quantity`, {
+                    valueAsNumber: true,
+                  })}
+                />
               </div>
 
               <FormField

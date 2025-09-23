@@ -19,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Grid3X3, List } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import SearchBar from "@/components/search-bar";
 import { globalVariables, type Phone } from "@/lib/db";
 import { useCart } from "@/context/cart-context";
 
@@ -77,8 +76,8 @@ export default function PhonesPage() {
     const filtered = phones.filter((phone) => {
       const brandMatch = brands.length === 0 || brands.includes(phone.brand);
       const priceMatch =
-        phone.specs.variants[0].originalPrice >= price[0] &&
-        phone.specs.variants[0].originalPrice <= price[1];
+        phone.specs.originalPrice >= price[0] &&
+        phone.specs.originalPrice <= price[1];
 
       return brandMatch && priceMatch;
     });
@@ -86,10 +85,10 @@ export default function PhonesPage() {
     // Apply sorting
     switch (sort) {
       case "price-low":
-        filtered.sort((a, b) => a.specs.variants[0].originalPrice - b.specs.variants[0].originalPrice);
+        filtered.sort((a, b) => a.specs.originalPrice - b.specs.originalPrice);
         break;
       case "price-high":
-        filtered.sort((a, b) => b.specs.variants[0].originalPrice - a.specs.variants[0].originalPrice);
+        filtered.sort((a, b) => b.specs.originalPrice - a.specs.originalPrice);
         break;
       case "newest":
         filtered.sort(
@@ -263,7 +262,7 @@ export default function PhonesPage() {
                   <Link href={`/phones/${phone._id}`}>
                     <div className="relative h-48 w-full mb-2">
                       <Image
-                        src={phone.specs.colors[0]?.image || "/placeholder.svg"}
+                        src={phone.specs.image || "/placeholder.svg"}
                         alt={phone.name}
                         fill
                         className="object-contain"
@@ -285,7 +284,7 @@ export default function PhonesPage() {
                   </Link>
                   <div className="flex items-center justify-between">
                     <div className="font-bold">
-                      ${phone.specs.variants[0].originalPrice}
+                      ${phone.specs.originalPrice}
                     </div>
                     <div className="flex items-center">
                       <span className="text-yellow-500">★</span>
@@ -301,14 +300,6 @@ export default function PhonesPage() {
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Add to Cart
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0"
-                  >
-                    <Heart className="h-4 w-4" />
-                    <span className="sr-only">Add to comparison</span>
                   </Button>
                 </div>
               </Card>

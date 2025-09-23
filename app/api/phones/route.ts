@@ -1,11 +1,13 @@
 import connectDB from "@/lib/connectDB";
+import { Phone } from "@/models/Model";
 import { NextResponse } from "next/server";
-import { Phone} from "@/models/Model";
+
 
 export async function GET(request: Request) {
   try {
     await connectDB();
     const phones = await Phone.find();
+    console.log(phones)
     
     return NextResponse.json(phones);
   } catch (err) {

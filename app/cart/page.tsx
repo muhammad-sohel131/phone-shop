@@ -86,17 +86,17 @@ export default function CartPage() {
                 return (
                   <div key={item.phoneId} className="flex items-center space-x-4">
                     <div className="relative h-20 w-20">
-                      <Image src={phone.image || "/placeholder.svg"} alt={phone.name} fill className="object-contain" />
+                      <Image src={phone.specs.image || "/placeholder.svg"} alt={phone.name} fill className="object-contain" />
                     </div>
                     <div className="flex-1 space-y-1">
-                      <Link href={`/phones/${phone.id}`} className="font-medium hover:underline">
+                      <Link href={`/phones/${phone._id}`} className="font-medium hover:underline">
                         {phone.name}
                       </Link>
                       <div className="text-sm text-muted-foreground">
                         {item.color && <span>Color: {item.color}</span>}
                         {item.storage && <span> | Storage: {item.storage}</span>}
                       </div>
-                      <div className="font-medium">${phone.price}</div>
+                      <div className="font-medium">${phone.specs.price}</div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button
@@ -117,7 +117,7 @@ export default function CartPage() {
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="font-medium w-24 text-right">${(phone.price * item.quantity).toFixed(2)}</div>
+                    <div className="font-medium w-24 text-right">${(phone.specs.price * item.quantity).toFixed(2)}</div>
                     <Button variant="ghost" size="icon" onClick={() => removeItem(item.phoneId)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>

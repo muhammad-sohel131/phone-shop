@@ -12,13 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import { globalVariables } from "@/lib/db";
-import { useRouter } from "next/compat/router";
+import { globalVariables, Phone } from "@/lib/db";
 import { redirect } from "next/navigation";
 
 export default function ProductsPage() {
-   const route = useRouter()
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Phone[]>([]);
  
 
   useEffect(() => {
@@ -69,7 +67,7 @@ export default function ProductsPage() {
               <div>
                 <p className="font-medium">{product.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  ${product.specs.variants[0].price}
+                  ${product.specs.price}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
