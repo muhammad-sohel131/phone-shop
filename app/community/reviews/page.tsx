@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Star } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { reviews, phones } from "@/lib/db"
+import { Phone, reviews } from "@/lib/db"
 import { useToast } from "@/components/ui/use-toast"
 
 export default function ReviewsPage() {
@@ -20,6 +20,7 @@ export default function ReviewsPage() {
   const [newReview, setNewReview] = useState({ phoneId: "", rating: 0, title: "", content: "" })
   const { user } = useAuth()
   const { toast } = useToast()
+  const phones: Phone[] = []
 
   const handleNewReview = (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,7 +75,7 @@ export default function ReviewsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {phones.map((phone) => (
-                    <SelectItem key={phone.id} value={phone.id.toString()}>
+                    <SelectItem key={phone._id} value={(phone?._id as string).toString()}>
                       {phone.name}
                     </SelectItem>
                   ))}

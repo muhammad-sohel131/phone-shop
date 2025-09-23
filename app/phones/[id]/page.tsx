@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useParams } from "next/navigation"
-import { phones } from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,22 +10,23 @@ import { ShoppingCart, Share2, Star, Check, BarChart2, ChevronLeft, ChevronRight
 import Image from "next/image"
 import Link from "next/link"
 import { useCart } from "@/context/cart-context"
-import { useComparison } from "@/context/comparison-context"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import { Phone } from "@/lib/db"
 
 export default function PhoneDetailPage() {
-  const params = useParams()
-  const phoneId = Number.parseInt(params.id as string)
-  const phone = phones.find((p) => p.id === phoneId)
+  const phones: Phone[] = []
 
-  const [selectedColor, setSelectedColor] = useState(phone?.specs.colors[0] || "")
-  const [selectedStorage, setSelectedStorage] = useState(phone?.specs.storage[0] || "")
+  const params = useParams()
+  const phoneId = params.id
+  const phone = phones.find((p) => p._id === phoneId)
+
+  const [selectedColor, setSelectedColor] = useState(phone?.specs.colors[0].color || "")
+  const [selectedStorage, setSelectedStorage] = useState(phone?.specs.variants[0].storage || "")
   const [quantity, setQuantity] = useState(1)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   const { addItem } = useCart()
-  const { addPhone, isInComparison } = useComparison()
   const { toast } = useToast()
 
   if (!phone) {
@@ -42,7 +42,7 @@ export default function PhoneDetailPage() {
   }
 
   const handleAddToCart = () => {
-    addItem(phone.id, quantity, selectedColor, selectedStorage)
+    addItem(phone._id as string, quantity, selectedColor, selectedStorage)
   }
 
   const handleShare = () => {
@@ -71,11 +71,11 @@ export default function PhoneDetailPage() {
   }
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev === phone.images.length - 1 ? 0 : prev + 1))
+    setCurrentImageIndex((prev) => (prev === phone.specs.colors.length - 1 ? 0 : prev + 1))
   }
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev === 0 ? phone.images.length - 1 : prev - 1))
+    setCurrentImageIndex((prev) => (prev === 0 ? phone.specs.colors.length - 1 : prev - 1))
   }
 
   return (
@@ -92,7 +92,7 @@ export default function PhoneDetailPage() {
         <div className="space-y-4">
           <div className="relative h-[400px] border rounded-lg overflow-hidden">
             <Image
-              src={phone.images[currentImageIndex] || "/placeholder.svg"}
+              src={phone.specs.colors[currentImageIndex].image || "/placeholder.svg"}
               alt={phone.name}
               fill
               className="object-contain"
@@ -118,7 +118,7 @@ export default function PhoneDetailPage() {
           </div>
 
           <div className="flex space-x-2 overflow-x-auto pb-2">
-            {phone.images.map((image, index) => (
+            {phone.specs.colors.map((color, index) => (
               <button
                 key={index}
                 className={`relative h-20 w-20 border rounded-md overflow-hidden ${
@@ -127,7 +127,7 @@ export default function PhoneDetailPage() {
                 onClick={() => setCurrentImageIndex(index)}
               >
                 <Image
-                  src={image || "/placeholder.svg"}
+                  src={color.image || "/placeholder.svg"}
                   alt={`${phone.name} - Image ${index + 1}`}
                   fill
                   className="object-contain"
@@ -149,8 +149,6 @@ export default function PhoneDetailPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => addPhone(phone.id)}
-                  disabled={isInComparison(phone.id)}
                 >
                   <BarChart2 className="h-5 w-5" />
                 </Button>
@@ -165,25 +163,25 @@ export default function PhoneDetailPage() {
                 <Star
                   key={i}
                   className={`h-5 w-5 ${
-                    i < Math.floor(phone.rating)
+                    i < Math.floor(phone.ratting || 0)
                       ? "text-yellow-500 fill-yellow-500"
-                      : i < phone.rating
+                      : i < Number(phone.ratting)
                         ? "text-yellow-500 fill-yellow-500"
                         : "text-muted-foreground"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-muted-foreground">({phone.rating} rating)</span>
+            <span className="text-muted-foreground">({phone.ratting} rating)</span>
           </div>
 
           <div className="space-y-2">
-            <div className="text-3xl font-bold">${phone.price}</div>
-            {phone.originalPrice && (
+            <div className="text-3xl font-bold">${phone.specs.variants[0].price}</div>
+            {phone.specs.variants[0].originalPrice && (
               <div className="flex items-center space-x-2">
-                <span className="text-muted-foreground line-through">${phone.originalPrice}</span>
+                <span className="text-muted-foreground line-through">${phone.specs.variants[0].originalPrice}</span>
                 <Badge variant="outline" className="text-green-600">
-                  Save ${(phone.originalPrice - phone.price).toFixed(2)}
+                  Save ${(phone.specs.variants[0].originalPrice - phone.specs.variants[0].price).toFixed(2)}
                 </Badge>
               </div>
             )}
@@ -197,13 +195,13 @@ export default function PhoneDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {phone.specs.colors.map((color) => (
                   <button
-                    key={color}
+                    key={color.color}
                     className={`px-3 py-1 border rounded-full ${
-                      selectedColor === color ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"
+                      selectedColor === color.color ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"
                     }`}
-                    onClick={() => setSelectedColor(color)}
+                    onClick={() => setSelectedColor(color.color)}
                   >
-                    {color}
+                    {color.color}
                   </button>
                 ))}
               </div>
@@ -212,17 +210,17 @@ export default function PhoneDetailPage() {
             <div className="space-y-2">
               <label className="font-medium">Storage</label>
               <div className="flex flex-wrap gap-2">
-                {phone.specs.storage.map((storage) => (
+                {phone.specs.variants.map((storage) => (
                   <button
-                    key={storage}
+                    key={storage.storage}
                     className={`px-3 py-1 border rounded-full ${
-                      selectedStorage === storage
+                      selectedStorage === storage.storage
                         ? "bg-primary text-primary-foreground"
                         : "bg-background hover:bg-muted"
                     }`}
-                    onClick={() => setSelectedStorage(storage)}
+                    onClick={() => setSelectedStorage(storage.storage)}
                   >
-                    {storage}
+                    {storage.storage}
                   </button>
                 ))}
               </div>
@@ -322,8 +320,7 @@ export default function PhoneDetailPage() {
                   <div className="space-y-2">
                     {[
                       { label: "Processor", value: phone.specs.processor },
-                      { label: "RAM", value: phone.specs.ram.join(", ") },
-                      { label: "Storage", value: phone.specs.storage.join(", ") },
+                      { label: "Storage", value: phone.specs.variants[0].storage},
                       { label: "Battery", value: phone.specs.battery },
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between">
@@ -337,9 +334,7 @@ export default function PhoneDetailPage() {
                   <div className="space-y-2">
                     {[
                       { label: "Main Camera", value: phone.specs.camera.main },
-                      { label: "Ultra-Wide", value: phone.specs.camera.ultraWide },
-                      { label: "Telephoto", value: phone.specs.camera.telephoto },
-                      { label: "Front Camera", value: phone.specs.camera.front },
+                      { label: "Front Camera", value: phone.specs.camera.selfie },
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between">
                         <span className="text-muted-foreground">{item.label}</span>

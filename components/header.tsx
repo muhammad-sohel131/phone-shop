@@ -136,7 +136,7 @@ export default function Header() {
           <Link href="/" className="flex items-center gap-2">
             <Phone className="h-6 w-6" />
             <span className="font-bold text-xl hidden sm:inline-block">
-              Phone Finder
+              Phone Shop
             </span>
           </Link>
         </div>

@@ -16,15 +16,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
-
-
-import { globalVariables } from "@/lib/db";
 import { useEffect, useState } from "react";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { redirect, useParams } from "next/navigation";
 
 // Define the form schema using Zod
-const formSchema = z.object({
+export const phoneSchema = z.object({
+  _id: z.string().optional(),
+  isNew: z.boolean().optional(),
+  ratting: z.number().optional(),
   owner: z.string(),
   name: z.string().min(2, "Name must be at least 2 characters."),
   brand: z.string().min(2, "Brand must be at least 2 characters."),
@@ -32,11 +32,17 @@ const formSchema = z.object({
   description: z
     .string()
     .min(10, "Description must be at least 10 characters."),
-  releaseDate: z.string(), 
+  releaseDate: z.string(),
   specs: z.object({
     display: z.string(),
     resolution: z.string(),
     processor: z.string(),
+    colors: z.array(
+      z.object({
+        color: z.string().min(1, "Color is required"),
+        image: z.string().url("Must be a valid URL"),
+      })
+    ),
     variants: z.array(
       z.object({
         price: z.number().min(0, "Price must be a positive number."),
@@ -45,10 +51,6 @@ const formSchema = z.object({
           .min(0, "Original price must be a positive number."),
         quantity: z.number().min(0, "Quantity must be a positive number."),
         storage: z.string().min(1, "Storage is required"),
-        colors: z.object({
-          color: z.string().min(1, "Color is required"),
-          image: z.string().url("Must be a valid URL"),
-        }),
       })
     ),
     battery: z.string(),
@@ -68,15 +70,14 @@ const formSchema = z.object({
 });
 
 export default function AddProductForm() {
+  const [saving, setSaving] = useState(false);
 
-  const [saving, setSaving] = useState(false)
-  
   const params = useParams();
   const paramsId = params.id;
 
   // Initialize the form with empty defaults
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof phoneSchema>>({
+    resolver: zodResolver(phoneSchema),
     defaultValues: {
       owner: "662423e97b709cc3a8c3b173",
       name: "",
@@ -88,13 +89,15 @@ export default function AddProductForm() {
         display: "",
         resolution: "",
         processor: "",
-        variants: [{
-          storage: "",
-          colors: { color: "", image: "" },
-          price: 0,
-          originalPrice: 0,
-          quantity: 0,
-        }],
+        colors: [{ color: "", image: "" }],
+        variants: [
+          {
+            storage: "",
+            price: 0,
+            originalPrice: 0,
+            quantity: 0,
+          },
+        ],
         battery: "",
         os: "",
         weight: "",
@@ -108,76 +111,102 @@ export default function AddProductForm() {
           waterResistance: false,
           wirelessCharging: false,
         },
-      }
-    }
+      },
+    },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: variants,
+    append: appendVariants,
+    remove: removeVariants,
+  } = useFieldArray({
     control: form.control,
     name: "specs.variants",
   });
 
+  const {
+    fields: colors,
+    append: appendColors,
+    remove: removeColors,
+  } = useFieldArray({
+    control: form.control,
+    name: "specs.colors",
+  });
+
   useEffect(() => {
-    if (paramsId && paramsId !== 'new') {
+    if (paramsId && paramsId !== "new") {
       fetch(`/api/phones/${paramsId}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data)
           form.reset({
             ...data,
-            releaseDate: data.releaseDate 
-            ? new Date(data.releaseDate).toISOString().split('T')[0]
-            : "",
+            releaseDate: data.releaseDate
+              ? new Date(data.releaseDate).toISOString().split("T")[0]
+              : "",
             specs: {
               ...data.specs,
-              variants: data.specs.variants?.length ? data.specs.variants : [{
-                storage: "",
-                colors: { color: "", image: "" },
-                price: 0,
-                originalPrice: 0,
-                quantity: 0,
-              }]
-            }
+              colors: data.specs.colors?.length
+                ? data.specs.colors : [{ color: "", image: "" }],
+              variants: data.specs.variants?.length
+                ? data.specs.variants
+                : [
+                    {
+                      storage: "",
+                      price: 0,
+                      originalPrice: 0,
+                      quantity: 0,
+                    },
+                  ],
+            },
           });
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     }
   }, [paramsId]);
 
   // Handle form submission
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof phoneSchema>) {
     console.log("Form submitted:", values);
     // Add your logic to submit the form data to the backend
-    setSaving(true)
+    setSaving(true);
     try {
-      const response = await fetch(paramsId !== 'new' ? `/api/phones/${paramsId}` : '/api/phones', {
-        method: paramsId !== 'new' ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
+      const response = await fetch(
+        paramsId !== "new" ? `/api/phones/${paramsId}` : "/api/phones",
+        {
+          method: paramsId !== "new" ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
+      console.log(response)
       if (!response.ok) {
         throw new Error("Failed to save phone data");
       }
 
       const data = await response.json();
-      toast.success(paramsId !== 'new' ? "Updated successfully" : "Added successfully")
+      toast.success(
+        paramsId !== "new" ? "Updated successfully" : "Added successfully"
+      );
       console.log("Data added successfully", data);
       setTimeout(() => {
-        redirect(`/admin/products`)
-      }, 500)
+        redirect(`/admin/products`);
+      }, 500);
     } catch (err) {
-      toast.error("Failed to save phone data")
+      toast.error("Failed to save phone data");
       console.log(err);
     }
 
-    setSaving(false)
+    setSaving(false);
   }
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-8">{paramsId !== 'new' ? "Edit" : "Add New"} Product</h1>
+        <h1 className="text-2xl font-bold mb-8">
+          {paramsId !== "new" ? "Edit" : "Add New"} Product
+        </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Basic Information */}
@@ -290,11 +319,54 @@ export default function AddProductForm() {
                 )}
               />
 
+              <div className="space-y-2">
+                <FormLabel>Colors</FormLabel>
+                {colors.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="flex border border-red-700 p-5 rounded-lg items-center gap-4"
+                  >
+                    <div className="w-[90%]">
+                      <span>Color</span>
+                      <Input
+                        placeholder="White"
+                        {...form.register(`specs.colors.${index}.color`)}
+                      />
+                      <span>Image</span>
+                      <Input
+                        placeholder="Image URL"
+                        {...form.register(`specs.colors.${index}.image`)}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      disabled={colors.length < 2 ? true : false}
+                      onClick={() =>
+                        colors.length > 1 && removeColors(index)
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() =>
+                    appendColors({
+                      color: '',
+                      image: ''
+                    })
+                  }
+                >
+                  Add Variant
+                </Button>
+              </div>
               {/* Variants (RAM & Storage) */}
 
               <div className="space-y-2">
                 <FormLabel>Variants</FormLabel>
-                {fields.map((field, index) => (
+                {variants.map((field, index) => (
                   <div
                     key={field.id}
                     className="flex border border-red-700 p-5 rounded-lg items-center gap-4"
@@ -304,20 +376,6 @@ export default function AddProductForm() {
                       <Input
                         placeholder="128GB/32GB"
                         {...form.register(`specs.variants.${index}.storage`)}
-                      />
-                      <span>Color</span>
-                      <Input
-                        placeholder="White"
-                        {...form.register(
-                          `specs.variants.${index}.colors.color`
-                        )}
-                      />
-                      <span>Image</span>
-                      <Input
-                        placeholder="Image URL"
-                        {...form.register(
-                          `specs.variants.${index}.colors.image`
-                        )}
                       />
                       <FormField
                         control={form.control}
@@ -364,8 +422,10 @@ export default function AddProductForm() {
                     <Button
                       type="button"
                       variant="destructive"
-                      disabled={fields.length < 2 ? true : false}
-                      onClick={() => fields.length > 1 && remove(index)}
+                      disabled={variants.length < 2 ? true : false}
+                      onClick={() =>
+                        variants.length > 1 && removeVariants(index)
+                      }
                     >
                       Remove
                     </Button>
@@ -374,9 +434,8 @@ export default function AddProductForm() {
                 <Button
                   type="button"
                   onClick={() =>
-                    append({
+                    appendVariants({
                       storage: "",
-                      colors: { color: "", image: "" },
                       price: 0,
                       originalPrice: 0,
                       quantity: 0,
@@ -532,7 +591,13 @@ export default function AddProductForm() {
 
             {/* Submit Button */}
             <Button type="submit" className="w-full" disabled={saving}>
-              {saving ?  paramsId !== 'new' ? 'Updating...' : 'Adding...' : paramsId !== 'new' ? 'Edit Product' : 'Add Product'}
+              {saving
+                ? paramsId !== "new"
+                  ? "Updating..."
+                  : "Adding..."
+                : paramsId !== "new"
+                ? "Edit Product"
+                : "Add Product"}
             </Button>
           </form>
         </Form>

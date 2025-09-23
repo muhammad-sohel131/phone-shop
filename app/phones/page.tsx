@@ -1,141 +1,152 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { ShoppingCart, Heart, Grid3X3, List } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import SearchBar from "@/components/search-bar"
-import { phones, type Phone } from "@/lib/db"
-import { useCart } from "@/context/cart-context"
-import { useComparison } from "@/context/comparison-context"
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { ShoppingCart, Heart, Grid3X3, List } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import SearchBar from "@/components/search-bar";
+import { globalVariables, type Phone } from "@/lib/db";
+import { useCart } from "@/context/cart-context";
 
 const FilterButton = ({ children }: { children: React.ReactNode }) => {
-  return <div className="lg:sticky lg:top-6">{children}</div>
-}
+  return <div className="lg:sticky lg:top-6">{children}</div>;
+};
 
 export default function PhonesPage() {
-  const [filteredPhones, setFilteredPhones] = useState<Phone[]>(phones)
-  const [brands, setBrands] = useState<string[]>([])
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([])
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000])
-  const [ram, setRam] = useState<string[]>([])
-  const [selectedRam, setSelectedRam] = useState<string[]>([])
-  const [storage, setStorage] = useState<string[]>([])
-  const [selectedStorage, setSelectedStorage] = useState<string[]>([])
-  const [sortBy, setSortBy] = useState("featured")
-  const { addItem } = useCart()
-  const { addPhone, isInComparison } = useComparison()
-  const searchParams = useSearchParams()
+  const [filteredPhones, setFilteredPhones] = useState<Phone[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
+  const [sortBy, setSortBy] = useState("featured");
+  const { addItem } = useCart();
+  const searchParams = useSearchParams();
+
+  const [phones, setProducts] = useState<Phone[]>([]);
 
   useEffect(() => {
-    const uniqueBrands = Array.from(new Set(phones.map((phone) => phone.brand)))
-    setBrands(uniqueBrands)
+    fetchProducts();
+  }, []);
 
-    const uniqueRam = Array.from(new Set(phones.flatMap((phone) => phone.specs.ram)))
-    setRam(uniqueRam)
+  const fetchProducts = async () => {
+    const response = await fetch(`${globalVariables.url}/api/phones`);
+    if (response.ok) {
+      const data = await response.json();
+      setProducts(data);
+      setFilteredPhones(data);
+    }
+  };
 
-    const uniqueStorage = Array.from(new Set(phones.flatMap((phone) => phone.specs.storage)))
-    setStorage(uniqueStorage)
-
+  useEffect(() => {
+    const uniqueBrands = Array.from(
+      new Set(phones.map((phone) => phone.brand))
+    );
+    setBrands(uniqueBrands);
     // Apply initial filters from URL
-    const urlBrands = searchParams.get("brand")?.split(",") || []
-    const urlMinPrice = Number(searchParams.get("minPrice")) || 0
-    const urlMaxPrice = Number(searchParams.get("maxPrice")) || 2000
-    const urlRam = searchParams.get("ram")?.split(",") || []
-    const urlStorage = searchParams.get("storage")?.split(",") || []
-    const urlSortBy = searchParams.get("sortBy") || "featured"
+    const urlBrands = searchParams.get("brand")?.split(",") || [];
+    const urlMinPrice = Number(searchParams.get("minPrice")) || 0;
+    const urlMaxPrice = Number(searchParams.get("maxPrice")) || 2000000;
+    const urlSortBy = searchParams.get("sortBy") || "featured";
 
-    setSelectedBrands(urlBrands)
-    setPriceRange([urlMinPrice, urlMaxPrice])
-    setSelectedRam(urlRam)
-    setSelectedStorage(urlStorage)
-    setSortBy(urlSortBy)
+    setSelectedBrands(urlBrands);
+    setPriceRange([urlMinPrice, urlMaxPrice]);
+    setSortBy(urlSortBy);
 
-    applyFilters(urlBrands, [urlMinPrice, urlMaxPrice], urlRam, urlStorage, urlSortBy)
-  }, [searchParams])
+    applyFilters(urlBrands, [urlMinPrice, urlMaxPrice], urlSortBy);
+  }, [searchParams, phones]);
 
-  const applyFilters = (brands: string[], price: [number, number], ram: string[], storage: string[], sort: string) => {
+  const applyFilters = (
+    brands: string[],
+    price: [number, number],
+    sort: string
+  ) => {
     const filtered = phones.filter((phone) => {
-      const brandMatch = brands.length === 0 || brands.includes(phone.brand)
-      const priceMatch = phone.price >= price[0] && phone.price <= price[1]
-      const ramMatch = ram.length === 0 || ram.some((r) => phone.specs.ram.includes(r))
-      const storageMatch = storage.length === 0 || storage.some((s) => phone.specs.storage.includes(s))
-      return brandMatch && priceMatch && ramMatch && storageMatch
-    })
+      const brandMatch = brands.length === 0 || brands.includes(phone.brand);
+      const priceMatch =
+        phone.specs.variants[0].originalPrice >= price[0] &&
+        phone.specs.variants[0].originalPrice <= price[1];
+
+      return brandMatch && priceMatch;
+    });
 
     // Apply sorting
     switch (sort) {
       case "price-low":
-        filtered.sort((a, b) => a.price - b.price)
-        break
+        filtered.sort((a, b) => a.specs.variants[0].originalPrice - b.specs.variants[0].originalPrice);
+        break;
       case "price-high":
-        filtered.sort((a, b) => b.price - a.price)
-        break
+        filtered.sort((a, b) => b.specs.variants[0].originalPrice - a.specs.variants[0].originalPrice);
+        break;
       case "newest":
-        filtered.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
-        break
-      case "rating":
-        filtered.sort((a, b) => b.rating - a.rating)
-        break
+        filtered.sort(
+          (a, b) =>
+            new Date(b.releaseDate).getTime() -
+            new Date(a.releaseDate).getTime()
+        );
+        break;
+      // case "rating":
+      //   filtered.sort((a, b) => b.rating - a.rating);
+      //   break;
       default:
         // 'featured' - no specific sorting, assume phones are already in featured order
-        break
+        break;
     }
 
-    setFilteredPhones(filtered)
-  }
+    setFilteredPhones(filtered);
+  };
 
   const handleBrandChange = (brand: string) => {
     const updatedBrands = selectedBrands.includes(brand)
       ? selectedBrands.filter((b) => b !== brand)
-      : [...selectedBrands, brand]
-    setSelectedBrands(updatedBrands)
-    applyFilters(updatedBrands, priceRange, selectedRam, selectedStorage, sortBy)
-  }
+      : [...selectedBrands, brand];
+    setSelectedBrands(updatedBrands);
+    applyFilters(
+      updatedBrands,
+      priceRange,
+      sortBy
+    );
+  };
 
-  const handleRamChange = (ramSize: string) => {
-    const updatedRam = selectedRam.includes(ramSize)
-      ? selectedRam.filter((r) => r !== ramSize)
-      : [...selectedRam, ramSize]
-    setSelectedRam(updatedRam)
-    applyFilters(selectedBrands, priceRange, updatedRam, selectedStorage, sortBy)
-  }
 
-  const handleStorageChange = (storageSize: string) => {
-    const updatedStorage = selectedStorage.includes(storageSize)
-      ? selectedStorage.filter((s) => s !== storageSize)
-      : [...selectedStorage, storageSize]
-    setSelectedStorage(updatedStorage)
-    applyFilters(selectedBrands, priceRange, selectedRam, updatedStorage, sortBy)
-  }
 
   const handlePriceChange = (value: number[]) => {
-    setPriceRange(value as [number, number])
-    applyFilters(selectedBrands, value as [number, number], selectedRam, selectedStorage, sortBy)
-  }
+    setPriceRange(value as [number, number]);
+    applyFilters(
+      selectedBrands,
+      value as [number, number],
+      sortBy
+    );
+  };
 
   const handleSortChange = (value: string) => {
-    setSortBy(value)
-    applyFilters(selectedBrands, priceRange, selectedRam, selectedStorage, value)
-  }
+    setSortBy(value);
+    applyFilters(
+      selectedBrands,
+      priceRange,
+      value
+    );
+  };
 
   const resetFilters = () => {
-    setSelectedBrands([])
-    setPriceRange([0, 2000])
-    setSelectedRam([])
-    setSelectedStorage([])
-    setSortBy("featured")
-    applyFilters([], [0, 2000], [], [], "featured")
-  }
+    setSelectedBrands([]);
+    setPriceRange([0, 2000]);
+    setSortBy("featured");
+    applyFilters([], [0, 2000], "featured");
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -158,7 +169,10 @@ export default function PhonesPage() {
                     <h3 className="font-medium">Brand</h3>
                     <div className="space-y-2">
                       {brands.map((brand) => (
-                        <div key={brand} className="flex items-center space-x-2">
+                        <div
+                          key={brand}
+                          className="flex items-center space-x-2"
+                        >
                           <Checkbox
                             id={`brand-${brand.toLowerCase()}`}
                             checked={selectedBrands.includes(brand)}
@@ -191,50 +205,6 @@ export default function PhonesPage() {
                       <span className="text-sm">${priceRange[1]}</span>
                     </div>
                   </div>
-
-                  {/* RAM Filter */}
-                  <div className="space-y-2">
-                    <h3 className="font-medium">RAM</h3>
-                    <div className="space-y-2">
-                      {ram.map((ramSize) => (
-                        <div key={ramSize} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`ram-${ramSize}`}
-                            checked={selectedRam.includes(ramSize)}
-                            onCheckedChange={() => handleRamChange(ramSize)}
-                          />
-                          <label
-                            htmlFor={`ram-${ramSize}`}
-                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {ramSize}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Storage Filter */}
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Storage</h3>
-                    <div className="space-y-2">
-                      {storage.map((storageSize) => (
-                        <div key={storageSize} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`storage-${storageSize}`}
-                            checked={selectedStorage.includes(storageSize)}
-                            onCheckedChange={() => handleStorageChange(storageSize)}
-                          />
-                          <label
-                            htmlFor={`storage-${storageSize}`}
-                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {storageSize}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -246,7 +216,7 @@ export default function PhonesPage() {
           {/* Search Bar */}
           <Card>
             <CardContent className="p-6">
-              <SearchBar />
+              {/* <SearchBar /> */}
             </CardContent>
           </Card>
 
@@ -254,7 +224,7 @@ export default function PhonesPage() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">
-                Showing {filteredPhones.length} of {phones.length} results
+                Showing {filteredPhones?.length} of {phones.length} results
               </span>
             </div>
             <div className="flex items-center gap-4">
@@ -284,31 +254,51 @@ export default function PhonesPage() {
 
           {/* Phone Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPhones.map((phone) => (
-              <Card key={phone.id} className="overflow-hidden">
+            {filteredPhones?.map((phone) => (
+              <Card key={phone._id} className="overflow-hidden">
                 <div className="relative pt-4 px-4">
-                  {phone.isNew && <Badge className="absolute top-6 right-6 z-10">New</Badge>}
-                  <Link href={`/phones/${phone.id}`}>
+                  {phone.isNew && (
+                    <Badge className="absolute top-6 right-6 z-10">New</Badge>
+                  )}
+                  <Link href={`/phones/${phone._id}`}>
                     <div className="relative h-48 w-full mb-2">
-                      <Image src={phone.image || "/placeholder.svg"} alt={phone.name} fill className="object-contain" />
+                      <Image
+                        src={phone.specs.colors[0]?.image || "/placeholder.svg"}
+                        alt={phone.name}
+                        fill
+                        className="object-contain"
+                      />
                     </div>
                   </Link>
                 </div>
                 <CardContent className="p-4">
-                  <div className="text-sm text-muted-foreground mb-1">{phone.brand}</div>
-                  <Link href={`/phones/${phone.id}`} className="hover:underline">
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-1">{phone.name}</h3>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    {phone.brand}
+                  </div>
+                  <Link
+                    href={`/phones/${phone._id}`}
+                    className="hover:underline"
+                  >
+                    <h3 className="font-semibold text-lg mb-2 line-clamp-1">
+                      {phone.name}
+                    </h3>
                   </Link>
                   <div className="flex items-center justify-between">
-                    <div className="font-bold">${phone.price}</div>
+                    <div className="font-bold">
+                      ${phone.specs.variants[0].originalPrice}
+                    </div>
                     <div className="flex items-center">
                       <span className="text-yellow-500">★</span>
-                      <span className="ml-1 text-sm">{phone.rating}</span>
+                      <span className="ml-1 text-sm">{phone.ratting}</span>
                     </div>
                   </div>
                 </CardContent>
                 <div className="p-4 pt-0 flex gap-2">
-                  <Button className="w-full" size="sm" onClick={() => addItem(phone.id)}>
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    onClick={() => addItem(phone._id as string)}
+                  >
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Add to Cart
                   </Button>
@@ -316,8 +306,6 @@ export default function PhonesPage() {
                     variant="outline"
                     size="icon"
                     className="shrink-0"
-                    onClick={() => addPhone(phone.id)}
-                    disabled={isInComparison(phone.id)}
                   >
                     <Heart className="h-4 w-4" />
                     <span className="sr-only">Add to comparison</span>
@@ -329,7 +317,7 @@ export default function PhonesPage() {
 
           {/* Pagination */}
           {/* For simplicity, we'll just show a "Load More" button instead of full pagination */}
-          {filteredPhones.length < phones.length && (
+          {filteredPhones?.length < phones.length && (
             <div className="flex justify-center mt-8">
               <Button variant="outline">Load More</Button>
             </div>
@@ -337,6 +325,5 @@ export default function PhonesPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

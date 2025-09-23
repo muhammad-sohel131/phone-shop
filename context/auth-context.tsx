@@ -1,8 +1,9 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import type { User } from "@/types/user"
+
 import Cookies from "js-cookie"
+import { User } from "@/lib/db"
 
 type AuthContextType = {
   user: User | null

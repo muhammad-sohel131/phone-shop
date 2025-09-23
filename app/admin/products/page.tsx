@@ -34,20 +34,6 @@ export default function ProductsPage() {
     }
   };
 
-  const handleUpdateProduct = async (updatedProduct: any) => {
-    const response = await fetch("/api/phones", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedProduct),
-    });
-
-    if (response.ok) {
-    } else {
-    }
-  };
-
   const handleDeleteProduct = async (productId: string) => {
     console.log(productId);
     const response = await fetch(`/api/phones?id=${productId}`, {

@@ -1,4 +1,6 @@
+import { phoneSchema } from "@/app/admin/addProductForm/[id]/page";
 import { parseISO, formatDistanceToNow } from "date-fns"
+import { z } from "zod";
 
 // Remove fs and path imports
 // import fs from "fs"
@@ -9,49 +11,52 @@ import { parseISO, formatDistanceToNow } from "date-fns"
 
 // Mock database for the Phone Finder app
 
-export type Phone = {
-  id: number
-  name: string
-  brand: string
-  price: number
-  originalPrice?: number
-  rating: number
-  image: string
-  images: string[]
-  isNew: boolean
-  isFeatured: boolean
-  specs: {
-    display: string
-    resolution: string
-    processor: string
-    ram: string[]
-    storage: string[]
-    battery: string
-    os: string
-    weight: string
-    dimensions: string
-    camera: {
-      main: string
-      ultraWide: string
-      telephoto: string
-      front: string
-      features: string[]
-    }
-    features: {
-      fiveG: boolean
-      wirelessCharging: boolean
-      waterResistance: string
-      expandableStorage: boolean
-      headphoneJack: boolean
-      stylus: boolean
-      faceUnlock: boolean
-      fingerprint: boolean
-    }
-    colors: string[]
-  }
-  description: string
-  releaseDate: string
-}
+// export type Phone = {
+//   id: number
+//   name: string
+//   brand: string
+//   price: number
+//   originalPrice?: number
+//   rating: number
+//   image: string
+//   images: string[]
+//   isNew: boolean
+//   isFeatured: boolean
+//   specs: {
+//     display: string
+//     resolution: string
+//     processor: string
+//     ram: string[]
+//     storage: string[]
+//     battery: string
+//     os: string
+//     weight: string
+//     dimensions: string
+//     camera: {
+//       main: string
+//       ultraWide: string
+//       telephoto: string
+//       front: string
+//       features: string[]
+//     }
+//     features: {
+//       fiveG: boolean
+//       wirelessCharging: boolean
+//       waterResistance: string
+//       expandableStorage: boolean
+//       headphoneJack: boolean
+//       stylus: boolean
+//       faceUnlock: boolean
+//       fingerprint: boolean
+//     }
+//     colors: string[]
+//   }
+//   description: string
+//   releaseDate: string
+// }
+
+// Infer the TypeScript type
+export type Phone = z.infer<typeof phoneSchema>;
 
 export type User = {
   id: number
@@ -64,7 +69,7 @@ export type User = {
 }
 
 export type CartItem = {
-  phoneId: number
+  phoneId: string
   quantity: number
   color?: string
   storage?: string
@@ -103,250 +108,6 @@ export type Reply = {
   helpfulCount: number
 }
 
-// Mock data
-export const phones: Phone[] = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro",
-    brand: "Apple",
-    price: 999,
-    originalPrice: 1099,
-    rating: 4.8,
-    image: "/placeholder.svg?height=400&width=300",
-    images: [
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-    ],
-    isNew: true,
-    isFeatured: true,
-    specs: {
-      display: '6.1" Super Retina XDR OLED',
-      resolution: "2556 x 1179 pixels",
-      processor: "A17 Pro",
-      ram: ["8GB"],
-      storage: ["128GB", "256GB", "512GB", "1TB"],
-      battery: "3,274 mAh",
-      os: "iOS 17",
-      weight: "187g",
-      dimensions: "146.7 x 71.5 x 8.3 mm",
-      camera: {
-        main: "48MP, f/1.8, OIS",
-        ultraWide: "12MP, f/2.2, 120° FOV",
-        telephoto: "12MP, f/2.8, 3x optical zoom",
-        front: "12MP, f/1.9",
-        features: ["Night mode", "Deep Fusion", "Smart HDR 4", "Portrait mode", "4K Dolby Vision HDR recording"],
-      },
-      features: {
-        fiveG: true,
-        wirelessCharging: true,
-        waterResistance: "IP68",
-        expandableStorage: false,
-        headphoneJack: false,
-        stylus: false,
-        faceUnlock: true,
-        fingerprint: false,
-      },
-      colors: ["Natural Titanium", "Blue Titanium", "White Titanium", "Black Titanium"],
-    },
-    description:
-      "The iPhone 15 Pro features a strong and lightweight titanium design with the A17 Pro chip, the most powerful smartphone chip yet. It has a 48MP Main camera with a 3x Telephoto camera, and a customizable Action button. The phone supports USB-C and has all-day battery life.",
-    releaseDate: "2023-09-22",
-  },
-  {
-    id: 2,
-    name: "Samsung Galaxy S23 Ultra",
-    brand: "Samsung",
-    price: 1199,
-    rating: 4.7,
-    image: "/placeholder.svg?height=400&width=300",
-    images: [
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-    ],
-    isNew: true,
-    isFeatured: true,
-    specs: {
-      display: '6.8" Dynamic AMOLED 2X',
-      resolution: "3088 x 1440 pixels",
-      processor: "Snapdragon 8 Gen 2",
-      ram: ["8GB", "12GB"],
-      storage: ["256GB", "512GB", "1TB"],
-      battery: "5,000 mAh",
-      os: "Android 14 (One UI 6)",
-      weight: "234g",
-      dimensions: "163.4 x 78.1 x 8.9 mm",
-      camera: {
-        main: "200MP, f/1.7, OIS",
-        ultraWide: "12MP, f/2.2, 120° FOV",
-        telephoto: "10MP, f/2.4, 3x optical zoom + 10MP, f/4.9, 10x optical zoom",
-        front: "12MP, f/2.2",
-        features: ["Nightography", "Portrait mode", "8K video recording", "Director's View", "Super Steady"],
-      },
-      features: {
-        fiveG: true,
-        wirelessCharging: true,
-        waterResistance: "IP68",
-        expandableStorage: false,
-        headphoneJack: false,
-        stylus: true,
-        faceUnlock: true,
-        fingerprint: true,
-      },
-      colors: ["Phantom Black", "Green", "Cream", "Lavender"],
-    },
-    description:
-      "The Samsung Galaxy S23 Ultra features a 200MP camera for stunning photos and videos, and the embedded S Pen for easy navigation and precision. It has a powerful Snapdragon 8 Gen 2 processor and a long-lasting 5,000 mAh battery. The phone is built with Armor Aluminum and Corning Gorilla Glass Victus 2.",
-    releaseDate: "2023-02-17",
-  },
-  {
-    id: 3,
-    name: "Google Pixel 8 Pro",
-    brand: "Google",
-    price: 899,
-    rating: 4.6,
-    image: "/placeholder.svg?height=400&width=300",
-    images: [
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-    ],
-    isNew: true,
-    isFeatured: true,
-    specs: {
-      display: '6.7" Super Actua OLED',
-      resolution: "2992 x 1344 pixels",
-      processor: "Google Tensor G3",
-      ram: ["12GB"],
-      storage: ["128GB", "256GB", "512GB"],
-      battery: "5,050 mAh",
-      os: "Android 14",
-      weight: "213g",
-      dimensions: "162.6 x 76.5 x 8.8 mm",
-      camera: {
-        main: "50MP, f/1.7, OIS",
-        ultraWide: "48MP, f/1.95, 125.5° FOV",
-        telephoto: "48MP, f/2.8, 5x optical zoom",
-        front: "10.5MP, f/2.2",
-        features: ["Night Sight", "Real Tone", "Magic Editor", "Photo Unblur", "4K60 video"],
-      },
-      features: {
-        fiveG: true,
-        wirelessCharging: true,
-        waterResistance: "IP68",
-        expandableStorage: false,
-        headphoneJack: false,
-        stylus: false,
-        faceUnlock: true,
-        fingerprint: true,
-      },
-      colors: ["Obsidian", "Porcelain", "Bay"],
-    },
-    description:
-      "The Google Pixel 8 Pro features Google's most advanced Pixel camera, with AI-powered editing tools like Magic Editor and Best Take. It has a 6.7-inch Super Actua display that's bright enough to see in direct sunlight. The phone is powered by the Google Tensor G3 chip and has a battery that can last beyond 24 hours with Extreme Battery Saver.",
-    releaseDate: "2023-10-12",
-  },
-  {
-    id: 4,
-    name: "OnePlus 12",
-    brand: "OnePlus",
-    price: 799,
-    rating: 4.5,
-    image: "/placeholder.svg?height=400&width=300",
-    images: [
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-    ],
-    isNew: false,
-    isFeatured: true,
-    specs: {
-      display: '6.82" LTPO AMOLED',
-      resolution: "3168 x 1440 pixels",
-      processor: "Snapdragon 8 Gen 3",
-      ram: ["12GB", "16GB"],
-      storage: ["256GB", "512GB"],
-      battery: "5,400 mAh",
-      os: "OxygenOS 14 (Android 14)",
-      weight: "220g",
-      dimensions: "164.3 x 75.8 x 9.2 mm",
-      camera: {
-        main: "50MP, f/1.6, OIS",
-        ultraWide: "48MP, f/2.2, 114° FOV",
-        telephoto: "64MP, f/2.6, 3x optical zoom",
-        front: "32MP, f/2.4",
-        features: ["Hasselblad Camera", "Natural Color Calibration", "Pro Mode", "4K HDR recording"],
-      },
-      features: {
-        fiveG: true,
-        wirelessCharging: true,
-        waterResistance: "IP65",
-        expandableStorage: false,
-        headphoneJack: false,
-        stylus: false,
-        faceUnlock: true,
-        fingerprint: true,
-      },
-      colors: ["Silky Black", "Flowy Emerald"],
-    },
-    description:
-      "The OnePlus 12 features a Snapdragon 8 Gen 3 processor and a 5,400 mAh battery with 100W SUPERVOOC fast charging. It has a 50MP main camera with a Hasselblad Camera System for natural colors. The phone has a 6.82-inch 2K 120Hz ProXDR display that's bright and smooth.",
-    releaseDate: "2024-01-23",
-  },
-  {
-    id: 5,
-    name: "Xiaomi 14",
-    brand: "Xiaomi",
-    price: 699,
-    rating: 4.4,
-    image: "/placeholder.svg?height=400&width=300",
-    images: [
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-      "/placeholder.svg?height=800&width=600",
-    ],
-    isNew: false,
-    isFeatured: false,
-    specs: {
-      display: '6.36" AMOLED',
-      resolution: "2670 x 1200 pixels",
-      processor: "Snapdragon 8 Gen 3",
-      ram: ["8GB", "12GB", "16GB"],
-      storage: ["256GB", "512GB", "1TB"],
-      battery: "4,610 mAh",
-      os: "HyperOS (Android 14)",
-      weight: "193g",
-      dimensions: "152.8 x 71.5 x 8.2 mm",
-      camera: {
-        main: "50MP, f/1.6, OIS",
-        ultraWide: "50MP, f/2.2, 115° FOV",
-        telephoto: "50MP, f/2.0, 3.2x optical zoom",
-        front: "32MP, f/2.0",
-        features: ["Leica Optics", "Night Mode", "Portrait Mode", "8K video recording"],
-      },
-      features: {
-        fiveG: true,
-        wirelessCharging: true,
-        waterResistance: "IP68",
-        expandableStorage: false,
-        headphoneJack: false,
-        stylus: false,
-        faceUnlock: true,
-        fingerprint: true,
-      },
-      colors: ["Black", "White", "Jade Green", "Titanium Blue"],
-    },
-    description:
-      "The Xiaomi 14 features a Leica professional optical lens and a Light Fusion 900 image sensor for stunning photos. It has a Snapdragon 8 Gen 3 processor and a 4,610 mAh battery with 90W HyperCharge. The phone has a 6.36-inch AMOLED display with a 120Hz refresh rate.",
-    releaseDate: "2024-02-25",
-  },
-]
 
 export const users: User[] = [
   {
@@ -548,7 +309,6 @@ export function readDb() {
   }
   return {
     users,
-    phones,
     orders: userOrders,
     reviews: userReviews,
     discussions: userDiscussions,

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Pencil, Trash2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import type { User } from "@/types/user"
+import { User } from "@/lib/db"
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])

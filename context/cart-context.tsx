@@ -1,18 +1,19 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { type CartItem, type Phone, phones } from "@/lib/db"
+import { type CartItem, type Phone } from "@/lib/db"
 import { useToast } from "@/components/ui/use-toast"
 
 type CartContextType = {
   items: CartItem[]
-  addItem: (phoneId: number, quantity?: number, color?: string, storage?: string) => void
-  removeItem: (phoneId: number) => void
-  updateQuantity: (phoneId: number, quantity: number) => void
+  addItem: (phoneId: string, quantity?: number, color?: string, storage?: string) => void
+  removeItem: (phoneId: string) => void
+  updateQuantity: (phoneId: string, quantity: number) => void
   clearCart: () => void
   itemCount: number
   subtotal: number
-  getPhone: (phoneId: number) => Phone | undefined
+  getPhone: (phoneId: string) => Phone | undefined,
+  phones: Phone[]
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -20,6 +21,8 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const { toast } = useToast()
+
+  const [phones, setPhones] = useState<Phone[]>([])
 
   useEffect(() => {
     // Load cart from localStorage
@@ -34,7 +37,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("cart", JSON.stringify(items))
   }, [items])
 
-  const addItem = (phoneId: number, quantity = 1, color?: string, storage?: string) => {
+  const addItem = (phoneId: string, quantity = 1, color?: string, storage?: string) => {
     setItems((prevItems) => {
       // Check if item already exists in cart
       const existingItemIndex = prevItems.findIndex((item) => item.phoneId === phoneId)
@@ -67,7 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const removeItem = (phoneId: number) => {
+  const removeItem = (phoneId: string) => {
     setItems((prevItems) => {
       const updatedItems = prevItems.filter((item) => item.phoneId !== phoneId)
 
@@ -80,7 +83,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const updateQuantity = (phoneId: number, quantity: number) => {
+  const updateQuantity = (phoneId: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(phoneId)
       return
@@ -104,15 +107,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const getPhone = (phoneId: number) => {
-    return phones.find((phone) => phone.id === phoneId)
+  const getPhone = (phoneId: string) => {
+    return phones.find((phone) => phone._id === phoneId)
   }
 
   const itemCount = items.reduce((total, item) => total + item.quantity, 0)
 
   const subtotal = items.reduce((total, item) => {
     const phone = getPhone(item.phoneId)
-    return total + (phone?.price || 0) * item.quantity
+    return total + (phone?.specs.variants[0].originalPrice || 0) * item.quantity
   }, 0)
 
   return (
@@ -126,6 +129,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         itemCount,
         subtotal,
         getPhone,
+        phones
       }}
     >
       {children}

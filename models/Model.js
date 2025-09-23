@@ -32,7 +32,7 @@ const phoneSchema = new Schema({
     dimensions: { type: String },
     camera: { type: Object },
     features: { type: Object },
-    // colors: [{ type: Object }]
+    colors: [{ type: Object }]
   }
 });
 

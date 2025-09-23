@@ -8,7 +8,6 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { AuthProvider } from "@/context/auth-context";
 import { CartProvider } from "@/context/cart-context";
-import { ComparisonProvider } from "@/context/comparison-context";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -37,7 +36,6 @@ export default function RootLayout({
           >
             <AuthProvider>
               <CartProvider>
-                <ComparisonProvider>
                   <div className="flex min-h-screen flex-col">
                     <Header />
                     <main className="flex-1">{children}</main>
@@ -45,7 +43,6 @@ export default function RootLayout({
                     <ToastContainer />
                     <Footer />
                   </div>
-                </ComparisonProvider>
               </CartProvider>
             </AuthProvider>
           </ThemeProvider>
