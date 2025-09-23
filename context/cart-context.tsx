@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { globalVariables, type CartItem, type Phone } from "@/lib/db";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "react-toastify";
 
 type CartContextType = {
   items: CartItem[];
@@ -26,7 +26,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const { toast } = useToast();
 
   const [phones, setProducts] = useState<Phone[]>([]);
 
@@ -56,7 +55,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items]);
 
   const addItem = (phoneId: string, quantity = 1) => {
-    console.log({ phoneId, quantity });
     setItems((prevItems) => {
       // Check if item already exists in cart
       const existingItemIndex = prevItems.findIndex(
@@ -71,18 +69,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: updatedItems[existingItemIndex].quantity + quantity,
         };
 
-        toast({
-          title: "Cart updated",
-          description: `Quantity increased for ${getPhone(phoneId)?.name}`,
-        });
+        toast.success("Cart updated.",)
 
         return updatedItems;
       } else {
         // Add new item
-        toast({
-          title: "Added to cart",
-          description: `${getPhone(phoneId)?.name} added to your cart`,
-        });
+        toast.success('Added to cart')
 
         return [...prevItems, { phoneId, quantity }];
       }
@@ -93,10 +85,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prevItems) => {
       const updatedItems = prevItems.filter((item) => item.phoneId !== phoneId);
 
-      toast({
-        title: "Item removed",
-        description: `${getPhone(phoneId)?.name} removed from your cart`,
-      });
+      toast.success("Item removed")
 
       return updatedItems;
     });
@@ -120,10 +109,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
-    toast({
-      title: "Cart cleared",
-      description: "All items have been removed from your cart",
-    });
+    toast.success("Cart cleared")
   };
 
   const getPhone = (phoneId: string) => {

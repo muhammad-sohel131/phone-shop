@@ -59,13 +59,13 @@ import { z } from "zod";
 export type Phone = z.infer<typeof phoneSchema>;
 
 export type User = {
-  id: number
+  _id?: number
   name: string
   email: string
-  password: string // In a real app, this would be hashed
-  role: "user" | "admin" | "moderator"
-  avatar: string
-  createdAt: string
+  password?: string 
+  role: "user" | "admin"
+  avatar?: string
+  createdAt?: string
 }
 
 export type CartItem = {
@@ -88,30 +88,27 @@ export type Review = {
   helpfulCount: number
 }
 
-export type Discussion = {
-  id: number
-  userId: number
+export type TDiscussion = {
+  _id?: string
+  userId: string
   title: string
   content: string
-  tags: string[]
   createdAt: string
-  viewCount: number
   replyCount: number
 }
 
-export type Reply = {
-  id: number
-  discussionId: number
+export type TReply = {
+  _id?: string
+  discussionId: string
   userId: number
   content: string
-  createdAt: string
-  helpfulCount: number
+  createdAt?: string
 }
 
 
 export const users: User[] = [
   {
-    id: 1,
+    _id: 1,
     name: "Admin User",
     email: "admin@phonefinder.com",
     password: "admin123", // In a real app, this would be hashed

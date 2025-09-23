@@ -95,26 +95,26 @@ const wishlistSchema = new Schema({
 
 // Discussion Schema
 const discussionSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  // userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+   userId: { type: String},
   title: { type: String, required: true },
   content: { type: String, required: true },
-  tags: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
-  viewCount: { type: Number, default: 0 },
   replyCount: { type: Number, default: 0 },
 });
 
 // Reply Schema
 const replySchema = new Schema({
-  discussionId: {
-    type: Schema.Types.ObjectId,
-    ref: "Discussion",
-    required: true,
-  },
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  // discussionId: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: "Discussion",
+  //   required: true,
+  // },
+  // userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  discussionId: {type: String},
+  userId: {type: String},
   content: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  helpfulCount: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now }
 });
 
 // Notification Schema
@@ -154,16 +154,16 @@ const OrderItem =
 const Review = mongoose.models.Review || mongoose.model("Review", reviewSchema);
 const Wishlist =
   mongoose.models.Wishlist || mongoose.model("Wishlist", wishlistSchema);
-const Discussion =
+export const Discussion =
   mongoose.models.Discussion || mongoose.model("Discussion", discussionSchema);
-const Reply = mongoose.models.Reply || mongoose.model("Reply", replySchema);
+export const Reply = mongoose.models.Reply || mongoose.model("Reply", replySchema);
 const Notification =
   mongoose.models.Notification ||
   mongoose.model("Notification", notificationSchema);
 const Analytics =
   mongoose.models.Analytics || mongoose.model("Analytics", analyticsSchema);
 
-export const models = {
+export default {
   User,
   Phone,
   Cart,
