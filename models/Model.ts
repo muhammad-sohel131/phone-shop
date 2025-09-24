@@ -143,7 +143,7 @@ const analyticsSchema = new Schema({
 });
 
 // Models
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+export const User = mongoose.models.User || mongoose.model("User", userSchema);
 export const Phone = mongoose.models.Phone || mongoose.model("Phone", phoneSchema);
 const Cart = mongoose.models.Cart || mongoose.model("Cart", cartSchema);
 const CartItem =

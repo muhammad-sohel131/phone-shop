@@ -2,7 +2,7 @@ import { phoneSchema } from "@/app/admin/addProductForm/[id]/page";
 import { z } from "zod";
 
 // Infer the TypeScript type
-export type Phone = z.infer<typeof phoneSchema>;
+export type TPhone = z.infer<typeof phoneSchema>;
 
 export type TUser = {
   _id?: number
@@ -14,7 +14,7 @@ export type TUser = {
   createdAt?: Date
 }
 
-export type CartItem = {
+export type TCartItem = {
   phoneId: string
   quantity: number
   color?: string
@@ -51,8 +51,8 @@ export type TReply = {
 
 
 // JSON storage for user actions
-export type Order = {
-  id: string
+export type TOrder = {
+  _id?: string
   userId: number
   items: {
     phoneId: number
@@ -60,73 +60,9 @@ export type Order = {
   }[]
   total: number
   status: "processing" | "shipped" | "delivered"
-  createdAt: string
+  createdAt: Date
 }
 
-export type UserDiscussion = {
-  id: number
-  userId: number
-  title: string
-  content: string
-  createdAt: string
-}
-
-export type UserReview = {
-  id: number
-  userId: number
-  phoneId: number
-  rating: number
-  title: string
-  content: string
-  createdAt: string
-}
-
-export type UserComment = {
-  id: number
-  userId: number
-  discussionId: number
-  content: string
-  createdAt: string
-}
-
-export const userOrders: Order[] = []
-export const userDiscussions: UserDiscussion[] = []
-export const userReviews: UserReview[] = []
-export const userComments: UserComment[] = []
-
-
-export const addDiscussion = (discussion: UserDiscussion) => {
-  userDiscussions.push(discussion)
-}
-
-export const addReview = (review: UserReview) => {
-  userReviews.push(review)
-}
-
-export const addComment = (comment: UserComment) => {
-  userComments.push(comment)
-}
-
-// New functions for data persistence using localStorage
-export function readDb() {
-  if (typeof window !== "undefined") {
-    const storedData = localStorage.getItem("phonefinderDb")
-    if (storedData) {
-      return JSON.parse(storedData)
-    }
-  }
-  return {
-    orders: userOrders,
-    reviews: userReviews,
-    discussions: userDiscussions,
-  }
-}
-
-export function writeDb(data: any) {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("phonefinderDb", JSON.stringify(data))
-  }
-}
 
 export const globalVariables = {
   url: "http://localhost:3000",

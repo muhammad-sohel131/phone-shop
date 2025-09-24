@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useCart } from "@/context/cart-context";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
-import { globalVariables, Phone, TReview } from "@/lib/db";
+import { globalVariables, TPhone, TReview } from "@/lib/db";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function PhoneDetailPage() {
-  const [phone, setPhone] = useState<Phone>();
+  const [phone, setPhone] = useState<TPhone>();
   const [reviewList, setReviewList] = useState<TReview[]>([]);
 
   const params = useParams();
@@ -62,7 +62,7 @@ export default function PhoneDetailPage() {
     const response = await fetch(`${globalVariables.url}/api/phones`);
     if (response.ok) {
       const data = await response.json();
-      const p = data.find((p: Phone) => p._id === phoneId);
+      const p = data.find((p: TPhone) => p._id === phoneId);
       console.log(p);
       setPhone(p);
     }

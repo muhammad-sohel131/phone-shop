@@ -1,5 +1,18 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle, Shield, Users, MessageSquare, Star, ThumbsUp } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  AlertTriangle,
+  Shield,
+  Users,
+  MessageSquare,
+  Star,
+  ThumbsUp,
+} from "lucide-react";
 
 export default function CommunityGuidelinesPage() {
   return (
@@ -8,8 +21,8 @@ export default function CommunityGuidelinesPage() {
         <CardHeader>
           <CardTitle className="text-3xl">Community Guidelines</CardTitle>
           <CardDescription>
-            Our community guidelines are designed to create a safe, respectful, and productive environment for all
-            members.
+            Our community guidelines are designed to create a safe, respectful,
+            and productive environment for all members.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
@@ -58,7 +71,9 @@ export default function CommunityGuidelinesPage() {
               Reviews
             </h2>
             <ul className="space-y-4 list-disc pl-6">
-              <li>Write honest and unbiased reviews based on personal experience</li>
+              <li>
+                Write honest and unbiased reviews based on personal experience
+              </li>
               <li>Include both pros and cons in your reviews</li>
               <li>Do not post fake or misleading reviews</li>
               <li>Respect intellectual property rights</li>
@@ -71,10 +86,14 @@ export default function CommunityGuidelinesPage() {
               Content Moderation
             </h2>
             <ul className="space-y-4 list-disc pl-6">
-              <li>Moderators may remove content that violates these guidelines</li>
+              <li>
+                Moderators may remove content that violates these guidelines
+              </li>
               <li>Repeated violations may result in account suspension</li>
               <li>Appeals can be made through the contact form</li>
-              <li>Guidelines are subject to change with notice to the community</li>
+              <li>
+                Guidelines are subject to change with notice to the community
+              </li>
             </ul>
           </section>
 
@@ -93,6 +112,5 @@ export default function CommunityGuidelinesPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

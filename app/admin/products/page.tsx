@@ -59,7 +59,7 @@ export default function ProductsPage() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {products.map((product: any) => (
+          {products.map((product: Phone) => (
             <div
               key={product._id}
               className="flex items-center justify-between"
@@ -78,7 +78,7 @@ export default function ProductsPage() {
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => handleDeleteProduct(product._id)}
+                  onClick={() => handleDeleteProduct(product._id as string)}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete

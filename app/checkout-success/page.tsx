@@ -1,7 +1,14 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function CheckoutSuccessPage() {
   return (
@@ -12,13 +19,22 @@ export default function CheckoutSuccessPage() {
             <CheckCircle className="h-16 w-16 text-green-500" />
           </div>
           <CardTitle className="text-2xl">Order Placed Successfully!</CardTitle>
-          <CardDescription>Thank you for your purchase. Your order has been placed successfully.</CardDescription>
+          <CardDescription>
+            Thank you for your purchase. Your order has been placed
+            successfully.
+          </CardDescription>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p>
-            Order #: <span className="font-medium">ORD-{Math.floor(Math.random() * 10000)}</span>
+            Order #:{" "}
+            <span className="font-medium">
+              ORD-{Math.floor(Math.random() * 10000)}
+            </span>
           </p>
-          <p>We've sent a confirmation email with all the details of your purchase.</p>
+          <p>
+            We've sent a confirmation email with all the details of your
+            purchase.
+          </p>
           <p>Your items will be shipped within 1-3 business days.</p>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
@@ -31,6 +47,5 @@ export default function CheckoutSuccessPage() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
-

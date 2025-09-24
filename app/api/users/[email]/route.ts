@@ -1,8 +1,8 @@
 import connectDB from "@/lib/connectDB"; // Import your database connection utility
-import {User} from "@/models/Model"; // Import the User model
+import { User } from "@/models/Model";
 import { NextResponse } from "next/server";
 
-export async function GET({ params } : {params: any}) {
+export async function GET({ params } : {params: {email: string}}) {
   try {
     await connectDB();
     const { email } = params; 

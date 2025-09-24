@@ -9,13 +9,13 @@ import { Review } from "@/models/Model";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-    const filters: Record<string, any> = {};
+    const filters: Record<string, string> = {};
 
   if (searchParams.get("phoneId")) {
-    filters.phoneId = searchParams.get("phoneId");
+    filters.phoneId = searchParams.get("phoneId") as string;
   }
   if (searchParams.get("userId")) {
-    filters.userId = searchParams.get("userId");
+    filters.userId = searchParams.get("userId") as string;
   }
 
   const reviews = await Review.find(filters);

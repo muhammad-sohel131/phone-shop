@@ -4,7 +4,6 @@ import {
   createDiscussion,
   updateDiscussion,
   deleteDiscussion,
-  getDiscussionById,
 } from "@/lib/discussions";
 
 export async function GET(request: Request) {
