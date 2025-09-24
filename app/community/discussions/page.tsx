@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Eye } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { discussions, TDiscussion } from "@/lib/db";
+import { TDiscussion } from "@/lib/db";
 import { toast } from "react-toastify";
 
 export default function DiscussionsPage() {
@@ -125,7 +125,7 @@ export default function DiscussionsPage() {
                 </div>
                 <span>User {discussion.userId}</span>
                 <span>•</span>
-                <span>{discussion.createdAt}</span>
+                <span>{new Date(discussion.createdAt as Date).toLocaleDateString()}</span>
               </CardDescription>
             </CardHeader>
             <CardContent>

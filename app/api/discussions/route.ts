@@ -9,8 +9,18 @@ import {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const discussionId = searchParams.get("discussionId");
-  const discussions = await getDiscussions(discussionId as string);
+  const filters: Record<string, any> = {};
+
+  if (searchParams.get("discussionId")) {
+    filters._id = searchParams.get("discussionId");
+  }
+  if (searchParams.get("userId")) {
+    filters.userId = searchParams.get("userId");
+  }
+  if (searchParams.get("status")) {
+    filters.status = searchParams.get("status");
+  }
+  const discussions = await getDiscussions(filters);
   return NextResponse.json(discussions);
 }
 

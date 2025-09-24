@@ -20,10 +20,19 @@ import Link from "next/link";
 import { useCart } from "@/context/cart-context";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
-import { globalVariables, Phone } from "@/lib/db";
+import { globalVariables, Phone, TReview } from "@/lib/db";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function PhoneDetailPage() {
   const [phone, setPhone] = useState<Phone>();
+  const [reviewList, setReviewList] = useState<TReview[]>([]);
 
   const params = useParams();
   const phoneId = params.id;
@@ -31,8 +40,24 @@ export default function PhoneDetailPage() {
   const [quantity, setQuantity] = useState(1);
 
   const { addItem } = useCart();
-  const { toast } = useToast();
 
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [review, setReview] = useState("");
+
+  const handleSubmit = async () => {
+    if (!rating || !review.trim()) return;
+
+    await fetch("/api/reviews", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating, content: review, phoneId }),
+    });
+
+    setRating(0);
+    setReview("");
+    alert("Review submitted!");
+  };
   const fetchProducts = async () => {
     const response = await fetch(`${globalVariables.url}/api/phones`);
     if (response.ok) {
@@ -47,6 +72,18 @@ export default function PhoneDetailPage() {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const fetchReviews = async () => {
+    const response = await fetch(`/api/reviews?phoneId=${phoneId}`);
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      setReviewList(data);
+    }
+  };
   if (!phone) {
     return (
       <div className="container py-12 text-center">
@@ -177,17 +214,6 @@ export default function PhoneDetailPage() {
               Add to Cart
             </Button>
           </div>
-
-          <div className="text-sm space-y-2">
-            <div className="flex items-center text-green-600">
-              <Check className="mr-2 h-4 w-4" />
-              Free shipping
-            </div>
-            <div className="flex items-center text-green-600">
-              <Check className="mr-2 h-4 w-4" />
-              30-day money-back guarantee
-            </div>
-          </div>
         </div>
       </div>
 
@@ -296,12 +322,56 @@ export default function PhoneDetailPage() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium">Customer Reviews</h3>
-                  <Button>Write a Review</Button>
+                  {/* Popup Trigger */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button>Write a Review</Button>
+                    </DialogTrigger>
+
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Write a Review</DialogTitle>
+                      </DialogHeader>
+
+                      {/* Rating stars */}
+                      <div className="flex gap-1 my-2">
+                        {Array.from({ length: 5 }).map((_, i) => {
+                          const starValue = i + 1;
+                          return (
+                            <Star
+                              key={i}
+                              className={`h-6 w-6 cursor-pointer ${
+                                (hoverRating || rating) >= starValue
+                                  ? "text-yellow-500 fill-yellow-500"
+                                  : "text-muted-foreground"
+                              }`}
+                              onClick={() => setRating(starValue)}
+                              onMouseEnter={() => setHoverRating(starValue)}
+                              onMouseLeave={() => setHoverRating(0)}
+                            />
+                          );
+                        })}
+                      </div>
+
+                      {/* Review textarea */}
+                      <Textarea
+                        placeholder="Write your review here..."
+                        value={review}
+                        onChange={(e) => setReview(e.target.value)}
+                        className="mt-2"
+                      />
+
+                      {/* Submit */}
+                      <Button className="mt-4 w-full" onClick={handleSubmit}>
+                        Submit Review
+                      </Button>
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 <div className="space-y-4">
                   {/* This would be populated with actual reviews from the database */}
-                  <div className="space-y-4 border-b pb-4">
+                  {reviewList.length > 0 && reviewList.map((review, index) => (<div className="space-y-4 border-b pb-4">
                     <div className="flex justify-between">
                       <div>
                         <div className="font-medium">John Doe</div>
@@ -310,11 +380,11 @@ export default function PhoneDetailPage() {
                         </div>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        2 weeks ago
+                       {new Date(review.createdAt as Date).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="flex">
-                      {Array.from({ length: 5 }).map((_, i) => (
+                      {Array.from({ length: review.rating }).map((_, i) => (
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
@@ -325,45 +395,11 @@ export default function PhoneDetailPage() {
                         />
                       ))}
                     </div>
-                    <h4 className="font-medium">
-                      Great phone, amazing camera!
-                    </h4>
                     <p className="text-sm">
-                      I've been using this phone for two weeks now and I'm very
-                      impressed with the camera quality and overall performance.
+                     {review.content}
                     </p>
-                  </div>
-
-                  <div className="space-y-4 border-b pb-4">
-                    <div className="flex justify-between">
-                      <div>
-                        <div className="font-medium">Jane Smith</div>
-                        <div className="text-sm text-muted-foreground">
-                          Verified Purchase
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        1 month ago
-                      </div>
-                    </div>
-                    <div className="flex">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < 5
-                              ? "text-yellow-500 fill-yellow-500"
-                              : "text-muted-foreground"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <h4 className="font-medium">Best phone I've ever owned</h4>
-                    <p className="text-sm">
-                      The battery life is incredible and the display is
-                      stunning. Highly recommend!
-                    </p>
-                  </div>
+                  </div>))}
+                  
                 </div>
               </div>
             </CardContent>

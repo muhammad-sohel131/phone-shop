@@ -77,13 +77,13 @@ const orderItemSchema = new Schema({
 
 // Review Schema
 const reviewSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  phoneId: { type: Schema.Types.ObjectId, ref: "Phone", required: true },
+  // userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  // phoneId: { type: Schema.Types.ObjectId, ref: "Phone", required: true },
+  userId: String,
+  phoneId: String,
   rating: { type: Number, required: true },
-  title: { type: String },
   content: { type: String },
   createdAt: { type: Date, default: Date.now },
-  helpfulCount: { type: Number, default: 0 },
 });
 
 // Wishlist Schema
@@ -151,7 +151,7 @@ const CartItem =
 const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
 const OrderItem =
   mongoose.models.OrderItem || mongoose.model("OrderItem", orderItemSchema);
-const Review = mongoose.models.Review || mongoose.model("Review", reviewSchema);
+export const Review = mongoose.models.Review || mongoose.model("Review", reviewSchema);
 const Wishlist =
   mongoose.models.Wishlist || mongoose.model("Wishlist", wishlistSchema);
 export const Discussion =

@@ -5,10 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { MessageSquare, Trash2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import type { Discussion } from "@/types/discussion"
+import { TDiscussion } from "@/lib/db"
 
 export default function AdminDiscussionsPage() {
-  const [discussions, setDiscussions] = useState<Discussion[]>([])
+  const [discussions, setDiscussions] = useState<TDiscussion[]>([])
   const { toast } = useToast()
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function AdminDiscussionsPage() {
       <CardContent>
         <div className="space-y-4">
           {discussions.map((discussion) => (
-            <div key={discussion.id} className="flex items-center justify-between border-b pb-4">
+            <div key={discussion._id} className="flex items-center justify-between border-b pb-4">
               <div>
                 <p className="font-medium">{discussion.title}</p>
                 <p className="text-sm text-muted-foreground">By User {discussion.userId}</p>

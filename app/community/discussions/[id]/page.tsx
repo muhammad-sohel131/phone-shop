@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { TDiscussion, TReply } from "@/lib/db";
@@ -25,7 +24,7 @@ export default function DiscussionDetails() {
           `/api/discussions?discussionId=${discussionId}`
         );
         const data = await res.json();
-        setDiscussion(data);
+        setDiscussion(data[0]);
       } catch (err) {
         console.error("Error fetching discussion", err);
       }
@@ -90,7 +89,7 @@ export default function DiscussionDetails() {
       {/* Replies */}
       <div className="space-y-4">
         {replies?.length > 0 ? (
-          replies.map((rep) => (
+          replies.map((rep: TReply) => (
             <Card key={rep._id}>
               <CardContent className="flex gap-3 items-start p-4">
                 <Avatar>

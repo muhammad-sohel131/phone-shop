@@ -3,13 +3,8 @@ import { TDiscussion, TReply } from "./db";
 
 let discussions: TDiscussion[] = [];
 
-export async function getDiscussions(discussionId?: string) {
-  if (discussionId) {
-    const res = await Discussion.findOne({ _id: discussionId });
-    return res;
-  }
-
-  const res = await Discussion.find();
+export async function getDiscussions(filters: Record<string, any> = {}) {
+  const res = await Discussion.find(filters);
   return res;
 }
 

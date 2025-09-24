@@ -1,23 +1,24 @@
-import type { Review } from "@/types/review"
+import { TReview } from "./db"
 
-let reviews: Review[] = []
 
-export function getReviews(): Review[] {
+let reviews: TReview[] = []
+
+export function getReviews(): TReview[] {
   return reviews
 }
 
-export function getReviewById(id: number): Review | undefined {
-  return reviews.find((review) => review.id === id)
+export function getReviewById(id: number): TReview | undefined {
+  return reviews.find((review) => review._id === id)
 }
 
-export function createReview(review: Omit<Review, "id">): Review {
+export function createReview(review: Omit<TReview, "id">): TReview {
   const newReview = { ...review, id: reviews.length + 1 }
   reviews.push(newReview)
   return newReview
 }
 
-export function updateReview(id: number, updates: Partial<Review>): Review | undefined {
-  const index = reviews.findIndex((review) => review.id === id)
+export function updateReview(id: number, updates: Partial<TReview>): TReview | undefined {
+  const index = reviews.findIndex((review) => review._id === id)
   if (index !== -1) {
     reviews[index] = { ...reviews[index], ...updates }
     return reviews[index]
@@ -27,7 +28,7 @@ export function updateReview(id: number, updates: Partial<Review>): Review | und
 
 export function deleteReview(id: number): boolean {
   const initialLength = reviews.length
-  reviews = reviews.filter((review) => review.id !== id)
+  reviews = reviews.filter((review) => review._id !== id)
   return reviews.length < initialLength
 }
 

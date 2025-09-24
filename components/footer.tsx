@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-lg font-bold mb-4">Phone Finder</h3>
+            <h3 className="text-lg font-bold mb-4">Phone Shop</h3>
             <p className="text-muted-foreground mb-4">
               Your one-stop platform to find, compare, discuss, and purchase the perfect smartphone.
             </p>
@@ -49,11 +49,6 @@ export default function Footer() {
                   Community
                 </Link>
               </li>
-              <li>
-                <Link href="/deals" className="text-muted-foreground hover:text-primary">
-                  Deals & Offers
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -88,18 +83,18 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <span className="text-muted-foreground">123 Tech Street, Digital City, 10001</span>
+                <span className="text-muted-foreground">Purbachal Road, Dhaka, Bangladesh</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-muted-foreground" />
-                <Link href="tel:+1234567890" className="text-muted-foreground hover:text-primary">
-                  +1 (234) 567-890
+                <Link href="tel:+8801302633568" className="text-muted-foreground hover:text-primary">
+                 +8801302633568
                 </Link>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-muted-foreground" />
                 <Link href="mailto:info@phonefinder.com" className="text-muted-foreground hover:text-primary">
-                  info@phonefinder.com
+                  phone.finder979@gmail.com
                 </Link>
               </li>
             </ul>
@@ -107,7 +102,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-12 pt-6 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Phone Finder. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Phone Shop. All rights reserved.</p>
         </div>
       </div>
     </footer>
