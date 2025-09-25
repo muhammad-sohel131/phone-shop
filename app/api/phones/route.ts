@@ -5,26 +5,51 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
-    await connectDB()
+    await connectDB();
 
-    const { searchParams } = new URL(request.url)
-    const limit = searchParams.get("limit")
-    const sort = searchParams.get("sort") 
+    const { searchParams } = new URL(request.url);
+    const limit = Number(searchParams.get("limit") || "12");
+    const page = Number(searchParams.get("page") || "1");
+    const sortBy = searchParams.get("sort") || "featured";
+    const brandParam = searchParams.get("brand") || "";
+    const minPrice = Number(searchParams.get("minPrice") || "0");
+    const maxPrice = Number(searchParams.get("maxPrice") || "2000000");
 
-    let query = Phone.find()
+    const brands = brandParam ? brandParam.split(",") : [];
 
-    if (sort === "recent") {
-      query = query.sort({ createdAt: -1 })
+    let query = Phone.find();
+
+    // Filter by brands
+    if (brands.length > 0) query = query.where("brand").in(brands);
+
+    // Filter by price
+    query = query.where("specs.originalPrice").gte(minPrice).lte(maxPrice);
+
+    // Sorting
+    switch (sortBy) {
+      case "price-low":
+        query = query.sort({ "specs.originalPrice": 1 });
+        break;
+      case "price-high":
+        query = query.sort({ "specs.originalPrice": -1 });
+        break;
+      case "newest":
+        query = query.sort({ createdAt: -1 });
+        break;
+      default:
+        query = query.sort({ featuredRank: 1 }); // optional
     }
-    if (limit) {
-      query = query.limit(Number(limit))
-    }
-    const phones = await query.exec()
 
-    return NextResponse.json(phones)
+    // Pagination
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+
+    const phones = await query.exec();
+
+    return NextResponse.json(phones, { headers: { "x-revalidate": "1" } }); // ISR tag optional
   } catch (err) {
-    console.error("Error fetching phones:", err)
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
+    console.error("Error fetching phones:", err);
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
 

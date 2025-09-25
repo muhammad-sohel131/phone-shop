@@ -1,11 +1,9 @@
 "use client";
 
-import type React from "react";
-
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState} from "react";
+import { globalVariables, type TPhone } from "@/lib/db";
+import PhonesFilters from "@/components/modules/commerce/phoneFilters";
+import PhoneGrid from "@/components/modules/commerce/phoneGrid";
 import {
   Select,
   SelectContent,
@@ -13,307 +11,132 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Heart, Grid3X3, List } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { globalVariables, type TPhone } from "@/lib/db";
-import { useCart } from "@/context/cart-context";
 
-const FilterButton = ({ children }: { children: React.ReactNode }) => {
-  return <div className="lg:sticky lg:top-6">{children}</div>;
-};
 
 export default function PhonesPage() {
-  const [filteredPhones, setFilteredPhones] = useState<TPhone[]>([]);
-  const [brands, setBrands] = useState<string[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
-  const [sortBy, setSortBy] = useState("featured");
-  const { addItem } = useCart();
-  const searchParams = useSearchParams();
-
-  const [phones, setProducts] = useState<TPhone[]>([]);
+  const [phones, setPhones] = useState<TPhone[]>([]);
+  const [allBrands, setAllBrands] = useState<string[]>([]);
+  const [filters, setFilters] = useState({
+    brands: [] as string[],
+    priceRange: [0, 200000] as [number, number],
+    sortBy: "featured",
+    page: 1,
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchProducts();
+    const fetchBrands = async () => {
+      const res = await fetch(`${globalVariables.url}/api/brands`);
+      const data = await res.json();
+      setAllBrands(data);
+    };
+    fetchBrands();
   }, []);
 
-  const fetchProducts = async () => {
-    const response = await fetch(`${globalVariables.url}/api/phones`);
-    if (response.ok) {
-      const data = await response.json();
-      setProducts(data);
-      setFilteredPhones(data);
-    }
+  const fetchPhones = async () => {
+    setIsLoading(true);
+    const query = new URLSearchParams({
+      brand: filters.brands.join(","),
+      minPrice: filters.priceRange[0].toString(),
+      maxPrice: filters.priceRange[1].toString(),
+      sort: filters.sortBy,
+      limit: "9",
+      page: filters.page.toString(),
+    });
+
+    const res = await fetch(`${globalVariables.url}/api/phones?${query}`);
+    const data = await res.json();
+    if (filters.page === 1) setPhones(data);
+    else setPhones((prev) => [...prev, ...data]);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    const uniqueBrands = Array.from(
-      new Set(phones.map((phone) => phone.brand))
-    );
-    setBrands(uniqueBrands);
-    // Apply initial filters from URL
-    const urlBrands = searchParams.get("brand")?.split(",") || [];
-    const urlMinPrice = Number(searchParams.get("minPrice")) || 0;
-    const urlMaxPrice = Number(searchParams.get("maxPrice")) || 2000000;
-    const urlSortBy = searchParams.get("sortBy") || "featured";
-
-    setSelectedBrands(urlBrands);
-    setPriceRange([urlMinPrice, urlMaxPrice]);
-    setSortBy(urlSortBy);
-
-    applyFilters(urlBrands, [urlMinPrice, urlMaxPrice], urlSortBy);
-  }, [searchParams, phones]);
-
-  const applyFilters = (
-    brands: string[],
-    price: [number, number],
-    sort: string
-  ) => {
-    const filtered = phones.filter((phone) => {
-      const brandMatch = brands.length === 0 || brands.includes(phone.brand);
-      const priceMatch =
-        phone.specs.originalPrice >= price[0] &&
-        phone.specs.originalPrice <= price[1];
-
-      return brandMatch && priceMatch;
-    });
-
-    // Apply sorting
-    switch (sort) {
-      case "price-low":
-        filtered.sort((a, b) => a.specs.originalPrice - b.specs.originalPrice);
-        break;
-      case "price-high":
-        filtered.sort((a, b) => b.specs.originalPrice - a.specs.originalPrice);
-        break;
-      case "newest":
-        filtered.sort(
-          (a, b) =>
-            new Date(b.releaseDate).getTime() -
-            new Date(a.releaseDate).getTime()
-        );
-        break;
-      // case "rating":
-      //   filtered.sort((a, b) => b.rating - a.rating);
-      //   break;
-      default:
-        // 'featured' - no specific sorting, assume phones are already in featured order
-        break;
-    }
-
-    setFilteredPhones(filtered);
-  };
+    fetchPhones();
+  }, [filters]);
 
   const handleBrandChange = (brand: string) => {
-    const updatedBrands = selectedBrands.includes(brand)
-      ? selectedBrands.filter((b) => b !== brand)
-      : [...selectedBrands, brand];
-    setSelectedBrands(updatedBrands);
-    applyFilters(
-      updatedBrands,
-      priceRange,
-      sortBy
-    );
+    const updated = filters.brands.includes(brand)
+      ? filters.brands.filter((b) => b !== brand)
+      : [...filters.brands, brand];
+    setFilters({ ...filters, brands: updated, page: 1 });
   };
 
-
-
-  const handlePriceChange = (value: number[]) => {
-    setPriceRange(value as [number, number]);
-    applyFilters(
-      selectedBrands,
-      value as [number, number],
-      sortBy
-    );
+  const handlePriceChange = (range: [number, number]) => {
+    setFilters({ ...filters, priceRange: range, page: 1 });
   };
 
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
-    applyFilters(
-      selectedBrands,
-      priceRange,
-      value
-    );
+  const handleSortChange = (sortBy: string) => {
+    setFilters({ ...filters, sortBy, page: 1 });
   };
 
-  const resetFilters = () => {
-    setSelectedBrands([]);
-    setPriceRange([0, 2000]);
-    setSortBy("featured");
-    applyFilters([], [0, 2000], "featured");
+  const handleReset = () => {
+    setFilters({
+      brands: [],
+      priceRange: [0, 200000],
+      sortBy: "featured",
+      page: 1,
+    });
+  };
+
+  const handleLoadMore = () => {
+    setFilters({ ...filters, page: filters.page + 1 });
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-        {/* Filters */}
-        <div className="w-full lg:w-1/4 space-y-6">
-          <FilterButton>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">Filters</h2>
-                  <Button variant="ghost" size="sm" onClick={resetFilters}>
-                    Reset
-                  </Button>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Brand Filter */}
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Brand</h3>
-                    <div className="space-y-2">
-                      {brands.map((brand) => (
-                        <div
-                          key={brand}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={`brand-${brand.toLowerCase()}`}
-                            checked={selectedBrands.includes(brand)}
-                            onCheckedChange={() => handleBrandChange(brand)}
-                          />
-                          <label
-                            htmlFor={`brand-${brand.toLowerCase()}`}
-                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {brand}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Price Range Filter */}
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Price Range</h3>
-                    <Slider
-                      defaultValue={[0, 2000]}
-                      max={2000}
-                      step={50}
-                      value={priceRange}
-                      onValueChange={handlePriceChange}
-                      className="my-6"
-                    />
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">${priceRange[0]}</span>
-                      <span className="text-sm">${priceRange[1]}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </FilterButton>
-        </div>
-
-        {/* Main Content */}
-        <div className="w-full lg:w-3/4 space-y-6">
-          {/* Search Bar */}
-          <Card>
-            <CardContent className="p-6">
-              {/* <SearchBar /> */}
-            </CardContent>
-          </Card>
-
-          {/* Results Controls */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">
-                Showing {filteredPhones?.length} of {phones.length} results
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="featured">Featured</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex items-center border rounded-md">
-                <Button variant="ghost" size="icon" className="rounded-none">
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="rounded-none">
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+    <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
+      <div className="w-full lg:w-1/4">
+        <PhonesFilters
+          brands={allBrands}
+          selectedBrands={filters.brands}
+          priceRange={filters.priceRange}
+          onBrandChange={handleBrandChange}
+          onPriceChange={handlePriceChange}
+          onReset={handleReset}
+        />
+      </div>
+      <div className="w-full lg:w-3/4">
+       <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center w-full justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              Showing {phones.length} results
+            </p>
+            {/* Sorting dropdown */}
+            <Select value={filters.sortBy} onValueChange={handleSortChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="featured">Featured</SelectItem>
+                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="rating">Highest Rated</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          {/* Phone Grid */}
+        </div>
+        {isLoading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPhones?.map((phone) => (
-              <Card key={phone._id} className="overflow-hidden">
-                <div className="relative pt-4 px-4">
-                  {phone.isNew && (
-                    <Badge className="absolute top-6 right-6 z-10">New</Badge>
-                  )}
-                  <Link href={`/phones/${phone._id}`}>
-                    <div className="relative h-48 w-full mb-2">
-                      <Image
-                        src={phone.specs.image || "/placeholder.svg"}
-                        alt={phone.name}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                  </Link>
-                </div>
-                <CardContent className="p-4">
-                  <div className="text-sm text-muted-foreground mb-1">
-                    {phone.brand}
-                  </div>
-                  <Link
-                    href={`/phones/${phone._id}`}
-                    className="hover:underline"
-                  >
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-1">
-                      {phone.name}
-                    </h3>
-                  </Link>
-                  <div className="flex items-center justify-between">
-                    <div className="font-bold">
-                      ${phone.specs.originalPrice}
-                    </div>
-                    <div className="flex items-center">
-                      <span className="text-yellow-500">★</span>
-                      <span className="ml-1 text-sm">{phone.ratting}</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <div className="p-4 pt-0 flex gap-2">
-                  <Button
-                    className="w-full"
-                    size="sm"
-                    onClick={() => addItem(phone._id as string)}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Add to Cart
-                  </Button>
-                </div>
-              </Card>
-            ))}
+            {Array(6)
+              .fill(0)
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="h-1/3 bg-gray-100 animate-pulse rounded-lg"
+                />
+              ))}
           </div>
+        )}
 
-          {/* Pagination */}
-          {/* For simplicity, we'll just show a "Load More" button instead of full pagination */}
-          {filteredPhones?.length < phones.length && (
-            <div className="flex justify-center mt-8">
-              <Button variant="outline">Load More</Button>
-            </div>
-          )}
-        </div>
+        <PhoneGrid phones={phones} />
+        {phones.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <button className="btn btn-outline" onClick={handleLoadMore}>
+              Load More
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
