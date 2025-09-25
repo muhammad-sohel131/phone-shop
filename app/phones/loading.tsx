@@ -1,4 +1,4 @@
 export default function Loading() {
-  return null
+  return <h2>Loading................</h2>
 }
 

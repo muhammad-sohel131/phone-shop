@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Heart, Grid3X3, List } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { globalVariables, type Phone } from "@/lib/db";
+import { globalVariables, type TPhone } from "@/lib/db";
 import { useCart } from "@/context/cart-context";
 
 const FilterButton = ({ children }: { children: React.ReactNode }) => {
@@ -27,7 +27,7 @@ const FilterButton = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default function PhonesPage() {
-  const [filteredPhones, setFilteredPhones] = useState<Phone[]>([]);
+  const [filteredPhones, setFilteredPhones] = useState<TPhone[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
@@ -35,7 +35,7 @@ export default function PhonesPage() {
   const { addItem } = useCart();
   const searchParams = useSearchParams();
 
-  const [phones, setProducts] = useState<Phone[]>([]);
+  const [phones, setProducts] = useState<TPhone[]>([]);
 
   useEffect(() => {
     fetchProducts();

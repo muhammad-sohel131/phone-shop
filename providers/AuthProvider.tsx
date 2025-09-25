@@ -7,11 +7,13 @@ import { ReactNode } from "react";
 
 const Check = ({ children }: { children: React.ReactNode }) => {
   const session = useSession();
+
   if (session.status === "loading") {
     return <h2>Loading...</h2>;
   }
+  console.log(session)
   return (
-    <AuthContext.Provider value={{ user: session.data?.user as TUser }}>
+    <AuthContext.Provider value={{ user: session?.data?.user as TUser }}>
       {children}
     </AuthContext.Provider>
   );

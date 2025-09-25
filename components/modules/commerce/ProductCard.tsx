@@ -1,23 +1,18 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, BarChart2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { TPhone } from "@/lib/db"
 import { useCart } from "@/context/cart-context"
 
-export default function FeaturedPhones() {
-  const {phones} = useCart()
-  const [featuredPhones, setFeaturedPhones] = useState(phones.filter((phone) => phone.isFeatured))
-  const { addItem } = useCart()
-
+export default function ProductCard({phone}: {phone: TPhone}) {
+      const { addItem } = useCart()
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {featuredPhones.map((phone) => (
-        <Card key={phone._id} className="overflow-hidden">
+     <Card key={phone._id} className="overflow-hidden">
           <div className="relative pt-4 px-4">
             {phone.isNew && <Badge className="absolute top-6 right-6 z-10">New</Badge>}
             <Link href={`/phones/${phone._id}`}>
@@ -46,8 +41,5 @@ export default function FeaturedPhones() {
             </Button>
           </CardFooter>
         </Card>
-      ))}
-    </div>
   )
 }
-

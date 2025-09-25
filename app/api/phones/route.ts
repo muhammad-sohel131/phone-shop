@@ -5,13 +5,26 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
-    await connectDB();
-    const phones = await Phone.find();
-    console.log(phones)
-    
-    return NextResponse.json(phones);
+    await connectDB()
+
+    const { searchParams } = new URL(request.url)
+    const limit = searchParams.get("limit")
+    const sort = searchParams.get("sort") 
+
+    let query = Phone.find()
+
+    if (sort === "recent") {
+      query = query.sort({ createdAt: -1 })
+    }
+    if (limit) {
+      query = query.limit(Number(limit))
+    }
+    const phones = await query.exec()
+
+    return NextResponse.json(phones)
   } catch (err) {
-    return NextResponse.json({ error: "Something Wrong" }, { status: 500 });
+    console.error("Error fetching phones:", err)
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }
 
