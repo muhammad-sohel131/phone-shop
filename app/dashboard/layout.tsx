@@ -1,16 +1,19 @@
+'use client'
 import type React from "react"
 import { AdminSidebar } from "@/components/admin-sidebar"
+import { useAuth } from "@/context/auth-context"
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // const user = useAuth()
   return (
     <div className="flex min-h-screen flex-col space-y-6">
       <header className="sticky top-0 z-40 border-b bg-background">
         <div className="container flex h-16 items-center justify-between py-4">
-          <h1 className="text-xl font-bold">Admin Dashboard</h1>
+          {/* <h1 className="text-xl font-bold">Welcome, {user?.name}</h1> */}
         </div>
       </header>
       <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr]">

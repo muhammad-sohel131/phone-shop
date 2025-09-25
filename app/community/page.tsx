@@ -55,7 +55,7 @@ export default function CommunityPage() {
       setDiscussions(data);
     }
   };
-  const { user } = useAuth();
+  const user = useAuth();
   const { toast } = useToast();
 
   const handleNewPost = (type: "discussion" | "review") => {

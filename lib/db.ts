@@ -1,4 +1,4 @@
-import { phoneSchema } from "@/app/admin/addProductForm/[id]/page";
+import { phoneSchema } from "@/app/dashboard/admin/addProductForm/[id]/page";
 import { z } from "zod";
 
 // Infer the TypeScript type
