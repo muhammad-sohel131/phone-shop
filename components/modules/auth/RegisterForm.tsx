@@ -42,7 +42,7 @@ export default function RegisterForm() {
       console.log(res)
       if (res?.email) {
         toast.success("User Registered Successfully");
-        router.push("/login");
+        router.push("/signin");
       }
     } catch (err) {
       console.error(err);
