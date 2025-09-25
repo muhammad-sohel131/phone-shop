@@ -12,11 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import { globalVariables, Phone } from "@/lib/db";
+import { globalVariables, TPhone } from "@/lib/db";
 import { redirect } from "next/navigation";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Phone[]>([]);
+  const [products, setProducts] = useState<TPhone[]>([]);
  
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function ProductsPage() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {products.map((product: Phone) => (
+          {products.map((product: TPhone) => (
             <div
               key={product._id}
               className="flex items-center justify-between"

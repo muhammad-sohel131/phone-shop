@@ -3,12 +3,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster"
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { AuthProvider } from "@/context/auth-context";
 import { CartProvider } from "@/context/cart-context";
-import { ClerkProvider } from "@clerk/nextjs";
 import { ToastContainer} from 'react-toastify';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -25,7 +22,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={inter.className}>
           <ThemeProvider
@@ -48,8 +44,9 @@ export default function RootLayout({
           </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
   );
 }
 
-import "./globals.css";
+import "./globals.css";import AuthProvider from "@/providers/AuthProvider";
+import { useSession } from "next-auth/react";
+

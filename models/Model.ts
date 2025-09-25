@@ -1,10 +1,14 @@
+import { TPhone, TUser } from "@/lib/db";
 import mongoose, { Schema } from "mongoose";
 
 
 // User Schema
-const userSchema = new Schema({
+const userSchema = new Schema<TUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  password: String,
+  avatar: String,
+  role: {type: String, default: 'user'},
   createdAt: { type: Date, default: Date.now },
 });
 

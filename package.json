@@ -50,6 +50,7 @@
     "lucide-react": "^0.454.0",
     "mongoose": "^8.12.1",
     "next": "15.2.1",
+    "next-auth": "^4.24.11",
     "next-themes": "latest",
     "pnpm": "^10.6.1",
     "react": "^18",

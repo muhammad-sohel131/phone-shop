@@ -7,27 +7,27 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { globalVariables, type CartItem, type Phone } from "@/lib/db";
+import { globalVariables, type TCartItem, type TPhone } from "@/lib/db";
 import { toast } from "react-toastify";
 
 type CartContextType = {
-  items: CartItem[];
+  items: TCartItem[];
   addItem: (phoneId: string, quantity?: number) => void;
   removeItem: (phoneId: string) => void;
   updateQuantity: (phoneId: string, quantity: number) => void;
   clearCart: () => void;
   itemCount: number;
   subtotal: number;
-  getPhone: (phoneId: string) => Phone | undefined;
-  phones: Phone[];
+  getPhone: (phoneId: string) => TPhone | undefined;
+  phones: TPhone[];
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<TCartItem[]>([]);
 
-  const [phones, setProducts] = useState<Phone[]>([]);
+  const [phones, setProducts] = useState<TPhone[]>([]);
 
   useEffect(() => {
     fetchProducts();

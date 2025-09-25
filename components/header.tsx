@@ -15,31 +15,16 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { ShoppingCart, Menu, Phone, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
 import RoleBasedButton from "./RoleBaseButton";
+import { useAuth } from "@/context/auth-context";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
   const { itemCount } = useCart();
+  const user = useAuth()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -82,10 +67,6 @@ export default function Header() {
                   Community
                 </Link>
                 <RoleBasedButton />
-                <SignedOut>
-                  <SignInButton />
-                  <SignUpButton />
-                </SignedOut>
 
                 {/* {user?.role === "admin" && (
                   <Link
@@ -211,18 +192,8 @@ export default function Header() {
           <ModeToggle />
           <div className="hidden md:flex gap-2">
             <RoleBasedButton />
-            <SignedOut>
-              <SignInButton />
-              <SignUpButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
           </div>
           <div className="md:hidden gap-2">
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
           </div>
         </div>
       </div>

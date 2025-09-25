@@ -1,64 +1,50 @@
-# Phone Finder
+# PhoneShop – E-commerce Platform with Community
 
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [API Reference](#api-reference)
-- [Team Members](#team-members)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+PhoneShop is a modern e-commerce web application built with Next.js, TypeScript, MongoDB, and Shadcn UI.  
+It allows users to buy phones, engage with a community through discussions, and share product reviews.  
+Admins can manage products, users, discussions, and reviews.  
 
-## Overview
+Live Demo: [PhoneShop](https://phone-shop-rho-one.vercel.app/)  
+Repository: [GitHub Repo](https://github.com/muhammad-sohel131/phone-shop)
 
-Phone Finder is a comprehensive web application designed to help users compare, discuss, and purchase the latest smartphones. This platform provides an intuitive interface for browsing phones, comparing their specifications, and making informed purchasing decisions. Whether you're a tech enthusiast or a casual user looking for your next phone, Phone Finder offers the tools and community to support your decision-making process.
+---
 
 ## Features
 
-- **Phone Catalog**: Browse a wide range of smartphones with detailed specifications.
-- **Advanced Search**: Filter phones based on various criteria such as brand, price range, and features.
-- **Comparison Tool**: Side-by-side comparison of up to three phones at a time.
-- **User Authentication**: Secure sign-up and login functionality.
-- **Shopping Cart**: Add phones to cart and manage purchases.
-- **Community Platform**: Engage in discussions and read reviews from other users.
-- **Responsive Design**: Fully responsive interface that works on desktop and mobile devices.
-- **Admin Dashboard**: Manage products, users, and orders (accessible to admin users only).
-- **Dark Mode**: Toggle between light and dark themes for comfortable viewing.
+### E-commerce
+- Browse and view phones with detailed information.
+- Add phones to cart and proceed to checkout.
+- Invoice PDF will be sent to Email.
+- Secure login system for purchases.
 
-## Technologies Used
+### Community
+- Discussions: Logged-in users can start discussions on specific phones.
+- Replies: Other users can reply and engage in conversations.
+- Reviews: Logged-in users can post reviews on phones.
+- Review Page: All reviews for a phone are shown to normal users.
 
-- **Frontend**:
-  - React.js 18.2.0
-  - Next.js 15.0.0 (with App Router)
-  - Tailwind CSS 3.3.0
-  - shadcn/ui components
-- **State Management**:
-  - React Context API
-- **Authentication**:
-  - Custom authentication system (simulated for demo)
-- **Routing**:
-  - Next.js App Router
-- **Icons**:
-  - Lucide React 0.300.0
-- **Development Tools**:
-  - TypeScript 5.0.0
-  - ESLint 8.56.0
-  - Prettier 3.1.0
+### Admin Dashboard
+- Add, update, and delete phone products.
+- Manage Orders
+- Manage users (ban/unban, assign roles).
+- Manage discussions and replies.
+- Manage reviews.
 
-## Getting Started
 
-### Prerequisites
+### User Dashboard
+- Manage Orders
+- Update Profile Info.
+- Manage own discussions and replies.
+- Manage own reviews.
+---
 
-- Node.js (v18.0.0 or later)
-- npm (v9.0.0 or later)
+## Tech Stack
 
-### Installation
+- Framework: Next.js
+- Language: TypeScript  
+- UI Library: Shadcn/UI + TailwindCSS  
+- Authentication: JWT  
+- Database: MongoDB with Mongoose  
+- Deployment: Vercel  
 
-1. Clone the repository:
-
+---

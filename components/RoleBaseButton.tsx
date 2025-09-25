@@ -1,19 +1,30 @@
-import { useAuth, useUser } from '@clerk/nextjs';
-import Link from 'next/link';
+"use client";
+import { useAuth } from "@/context/auth-context";
+import Link from "next/link";
+import { Button } from "./ui/button";
+import { signOut } from "next-auth/react";
 
 export default function RoleBasedButton() {
-    const {user} = useUser();
-
-  if (user && user?.publicMetadata?.role === 'admin') {
+  const user = useAuth();
+  if (user) {
     return (
-        <Link className="bg-blue-500 text-white px-4 py-2 rounded" href='/admin'>Admin Dashboard</Link>
+      <>
+       <Button variant='secondary' size='sm'>
+         <Link
+          href="/dashboard"
+        >
+          Dashboard
+        </Link>
+       </Button>
+        <Button onClick={() => signOut()} variant='outline'  size="sm" className="text-sm">
+          Sign Out
+        </Button>
+      </>
     );
-  }else if(user) {
-    return(
-        <Link className="bg-red-500 text-white px-4 py-2 rounded" href='/user'>User Dashboard</Link>
-    )
   }
-
-  // Return null if the user doesn't have the required role
-  return null;
+  return (
+    <Button asChild size="sm" variant='secondary' className="text-sm">
+      <Link href="/signin">Sign In</Link>
+    </Button>
+  );
 }
